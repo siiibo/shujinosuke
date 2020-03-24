@@ -1,0 +1,21 @@
+{
+  "name": "botkit-shujinosuke",
+  "version": "1.0.0",
+  "description": "",
+  "main": "bot.js",
+  "private": true,
+  "scripts": {
+    "start": "nodemon --config .nodemon.json",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "dependencies": {
+    "botbuilder-adapter-slack": "^1.0.10",
+    "botbuilder-storage-mongodb": "^0.9.5",
+    "botkit": "^4.6.2",
+    "botkit-plugin-cms": "^1.0.3",
+    "dotenv": "^7.0.0"
+  },
+  "devDependencies": {
+    "nodemon": "^2.0.2"
+  }
+}
