@@ -17,18 +17,22 @@ const INITIAL_STATE = {
 };
 let state = INITIAL_STATE;
 
-module.exports = function(controller) {
-  controller.ready(async () => {
-    if (process.env.MYTEAM) {
-      let bot = await controller.spawn(process.env.MYTEAM);
-      await bot.startConversationInChannel(
-        process.env.MYCHAN,
-        process.env.MYUSER
-      );
-      await bot.say("復帰しました〜");
+async function join(bot, message) {
+  if ([STARTING, STARTED].includes(state.type) && message.user) {
+    if (
+      state.members.waiting.includes(message.user) ||
+      state.members.done.includes(message.user) ||
+      state.members.assigned === message.user
+    ) {
+      await bot.replyEphemeral(message, "(大丈夫、参加済みですよ :+1:)");
+    } else {
+      state.members.waiting.push(message.user);
+      await bot.reply(message, `:hand: <@${message.user}> が参加しました`);
     }
-  });
+  }
+}
 
+module.exports = function(controller) {
   controller.hears(/開始/g, "direct_mention", async (bot, message) => {
     if (state.type === SLEEPING) {
       state.type = STARTING;
@@ -227,18 +231,3 @@ ${JSON.stringify(state, null, 2)}
 `);
   });
 };
-
-async function join(bot, message) {
-  if ([STARTING, STARTED].includes(state.type) && message.user) {
-    if (
-      state.members.waiting.includes(message.user) ||
-      state.members.done.includes(message.user) ||
-      state.members.assigned === message.user
-    ) {
-      await bot.replyEphemeral(message, "(大丈夫、参加済みですよ :+1:)");
-    } else {
-      state.members.waiting.push(message.user);
-      await bot.reply(message, `:hand: <@${message.user}> が参加しました`);
-    }
-  }
-}
