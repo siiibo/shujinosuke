@@ -205,6 +205,20 @@ module.exports = function(controller) {
     }
   });
 
+  controller.hears(
+    /終了|リセット|reset/g,
+    "direct_mention",
+    async (bot, message) => {
+      await bot.say(`
+リセットします。直前の状態は以下のようになっていました:
+\`\`\`
+${JSON.stringify(state, null, 2)}
+\`\`\`
+`);
+      state = Object.assign(state, INITIAL_STATE);
+    }
+  );
+
   controller.hears("status", "direct_mention", async (bot, message) => {
     await bot.say(`
 \`\`\`
