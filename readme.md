@@ -28,3 +28,13 @@
 - 適当なテストチャンネルに"Shujinosuke"アプリをインストール、もしくはすでにインストール済みのチャンネルで作業
 - チャンネルで、`@Shujinosuke status`と投稿して疎通確認
 - すでにクラウドにデプロイしたものがある場合、上記開発作業が完了したらデプロイ先ドメインの値に戻す
+
+## デプロイ
+
+- [Heroku](https://dashboard.heroku.com/apps/shujinosuke)に free dyno でデプロイしている
+  - アカウントは`tech@siiibo.com`。認証情報は既存メンバから取得する
+  - [Heroku CLI]()をインストールすればローカルから情報の取得や設定ができる
+    - ローカル開発時に`.env`に設定している認証情報は、Heroku では Config Var として設定する
+  - 待ち受けポートは、自動的に Heroku によって`PORT`環境変数経由で設定される(Botkit は`PORT`環境変数に対応している)
+- GitHub リポジトリと同期しているので、GitHub に`master`ブランチを push すればデプロイされる
+- URL は https://shujinosuke.herokuapp.com
