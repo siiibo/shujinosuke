@@ -8,6 +8,11 @@
 
 - 週次定例 MTG のファシリテータ
 
+## ToDo
+
+- [ ] 複数チャンネル対応
+- [ ] 設定変更と永続化
+
 ## 開発
 
 - [Shujinoske slack app](https://api.slack.com/apps/A0108T7KFV0/general)のコラボレータに招待してもらう
