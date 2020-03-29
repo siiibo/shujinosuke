@@ -97,7 +97,7 @@ module.exports = function(controller) {
 
   controller.on("continue_session", async (bot, message) => {
     state.members.assigned = state.members.waiting.shift();
-    if (state.type === STARTED && state.members.assigned) {
+    if ([STARTING, STARTED].includes(state.type) && state.members.assigned) {
       state.type = STARTED;
       await bot.say(`
 :stopwatch: 時間になりました。では<@${state.members.assigned}>お願いします！
