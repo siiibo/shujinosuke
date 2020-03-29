@@ -8,7 +8,6 @@ const DEFAULT_STARTING_PERIOD_SECONDS = 300;
 const COMMENT_PERIOD_SECONDS = 10;
 let state = {
   type: SLEEPING,
-  starting_period_seconds: DEFAULT_STARTING_PERIOD_SECONDS,
   members: {
     waiting: [],
     assigned: null,
@@ -28,15 +27,18 @@ module.exports = function(controller) {
     }
   });
 
-  controller.hears("開始", "direct_mention", async (bot, message) => {
+  controller.hears(/開始/g, "direct_mention", async (bot, message) => {
     if (state.type === SLEEPING) {
       state.type = STARTING;
+      const matches = message.text.match(/(\d+)分後/g);
+      const starting_period_seconds =
+        (matches[0] && matches[0] * 60) || DEFAULT_STARTING_PERIOD_SECONDS;
       setTimeout(async () => {
         await bot.changeContext(message.reference);
         controller.trigger("continue_session", bot, message);
-      }, state.starting_period_seconds * 1000);
+      }, starting_period_seconds * 1000);
       const readable_starting_period = moment
-        .duration(state.starting_period_seconds, "seconds")
+        .duration(starting_period_seconds, "seconds")
         .humanize();
       await bot.reply(message, {
         blocks: [
@@ -47,13 +49,26 @@ module.exports = function(controller) {
               text: `
 :spiral_calendar_pad: ${readable_starting_period}後に週次定例を始めます。
 :mega: 参加者は「:rocket: 参加」ボタンをクリックか、"@Shujinosuke 参加"と返信！
-:writing_hand: 各自レポートを下書きしておいてください！ 始まったら指名していきます。
-(:warning: ちなみに私は物覚えが悪いので、妙な操作をされると記憶をなくします :boom:)
+:clipboard: 下記項目をコピーしてレポートを下書きしてください！ 始まったら指名していきます。
 `
             }
           },
           {
             type: "divider"
+          },
+          {
+            type: "section",
+            text: {
+              type: "mrkdwn",
+              text: `
+*先週から注力してうまくいったこと（＋新たな知見）*
+*
+*苦戦していること（助けがいる場合はその旨）*
+*
+*来週にかけて注力すること*
+*
+`
+            }
           },
           {
             type: "actions",
@@ -105,7 +120,7 @@ module.exports = function(controller) {
   });
 
   controller.hears(
-    new RegExp("レポート"),
+    /レポート/g,
     "direct_mention,mention",
     async (bot, message) => {
       if (state.type === STARTED && message.user === state.members.assigned) {
@@ -128,7 +143,7 @@ module.exports = function(controller) {
   );
 
   controller.hears(
-    "スキップ",
+    /スキップ/g,
     "direct_mention,mention",
     async (bot, message) => {
       if (state.type === STARTED && state.members.assigned) {
@@ -142,19 +157,15 @@ module.exports = function(controller) {
     }
   );
 
-  controller.hears(
-    new RegExp("誰"),
-    "direct_mention,mention",
-    async (bot, message) => {
-      if (state.type === STARTED && state.members.assigned) {
-        await bot.say(`
+  controller.hears(/誰/g, "direct_mention,mention", async (bot, message) => {
+    if (state.type === STARTED && state.members.assigned) {
+      await bot.say(`
 :point_right: 今は<@${state.members.assigned}>の番です。
 :pencil: "@Shujinosuke レポート: 今週は……" のように「レポート」という単語を含めて私に返信してください。
 :fast_forward: "@Shujinosuke スキップ" で後回しにもできます。
 `);
-      }
     }
-  );
+  });
 
   controller.hears("status", "direct_mention", async (bot, message) => {
     await bot.say(`
