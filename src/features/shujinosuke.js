@@ -121,7 +121,7 @@ module.exports = function(controller) {
   });
 
   controller.on("end_session", async (bot, message) => {
-    state = Object.assign(state, INITIAL_STATE);
+    state = INITIAL_STATE;
     await bot.say(`
 :stopwatch: 時間になりました！ みなさんご協力ありがとうございました。 :bow:
 :rainbow: リフレッシュして、業務に戻りましょう！ :notes:
@@ -214,7 +214,7 @@ module.exports = function(controller) {
     "direct_mention",
     async (bot, message) => {
       const state_dump = JSON.stringify(state, null, 2);
-      state = Object.assign(state, INITIAL_STATE);
+      state = INITIAL_STATE;
       await bot.say(`
 リセットします。直前の状態は以下のようになっていました:
 \`\`\`
