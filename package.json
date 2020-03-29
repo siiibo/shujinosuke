@@ -10,7 +10,7 @@
   },
   "scripts": {
     "postinstall": "test -e .env || cp .env.template .env",
-    "start": "if [ $NODE_ENV == 'production' ]; then node src/bot.js; else nodemon --config .nodemon.json; fi"
+    "start": "nodemon --config .nodemon.json"
   },
   "dependencies": {
     "botbuilder-adapter-slack": "^1.0.10",
