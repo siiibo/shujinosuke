@@ -193,14 +193,26 @@ module.exports = function(controller) {
       } else {
         const latest_assigned = state.members.done.slice(-1)[0];
         const next_up = state.members.waiting[0];
-        let message = "";
         if (latest_assigned) {
-          message += `:point_up: 今は<@${latest_assigned}>のレポートをみんなで読んでいます。`;
+          if (next_up) {
+            await bot.say(`
+:point_up: 今は<@${latest_assigned}>のレポートをみんなで読んでいます。
+:point_down: 次は<@${next_up}>なので準備お願いします。
+`);
+          } else {
+            await bot.say(
+              `:point_up: 今は<@${latest_assigned}>のレポートをみんなで読んでいます。`
+            );
+          }
+        } else {
+          if (next_up) {
+            await bot.say(
+              `:point_down: 最初は<@${next_up}>なので準備お願いします。`
+            );
+          } else {
+            await bot.say(`:mega: 現在参加受付中です。`);
+          }
         }
-        if (next_up) {
-          message += `\n:point_down: 次は<@${next_up}>なので準備お願いします。`;
-        }
-        await bot.say(message);
       }
     }
   });
