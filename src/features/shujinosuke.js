@@ -97,7 +97,7 @@ module.exports = function(controller) {
 
   controller.on("continue_session", async (bot, message) => {
     state.members.assigned = state.members.waiting.shift();
-    if (state.members.assigned) {
+    if (state.type === STARTED && state.members.assigned) {
       state.type = STARTED;
       await bot.say(`
 :stopwatch: 時間になりました。では<@${state.members.assigned}>お願いします！
@@ -120,12 +120,14 @@ module.exports = function(controller) {
   });
 
   controller.on("end_session", async (bot, message) => {
-    state.type = SLEEPING;
-    state.members = { waiting: [], assigned: null, done: [] };
-    await bot.say(`
+    if (state.type === STARTED) {
+      state.type = SLEEPING;
+      state.members = { waiting: [], assigned: null, done: [] };
+      await bot.say(`
 :stopwatch: 時間になりました！ みなさんご協力ありがとうございました。 :bow:
 :rainbow: リフレッシュして、業務に戻りましょう！ :notes:
 `);
+    }
   });
 
   controller.on("block_actions", async (bot, message) => {
