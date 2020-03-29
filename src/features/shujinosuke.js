@@ -50,7 +50,7 @@ module.exports = function(controller) {
               text: `
 :spiral_calendar_pad: ${readable_starting_period}後に週次定例を始めます。
 :mega: 参加者は「:rocket: 参加」ボタンをクリックか、"@Shujinosuke 参加"と返信！
-:clipboard: 下記項目をコピーしてレポートを下書きしてください！ 始まったら指名していきます。
+:clipboard: 以下をコピーしてレポートを下書きしてください！ 始まったら指名していきます。
 `
             }
           },
