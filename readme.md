@@ -10,13 +10,15 @@
 
 ## 開発
 
+- [Shujinoske slack app](https://api.slack.com/apps/A0108T7KFV0/general)のコラボレータに招待してもらう
 - [`ngrok`](https://ngrok.com/)をインストール
   - `brew cask install ngrok`など
 - このリポジトリを clone して、以下実行
-  ```
+  ```sh
   asdf install
   asdf reshim yarn
   yarn
+  # 認証情報を上記リンクのページから取得して .env ファイルに入力
   yarn start
   ```
 - `ngrok http 3000`で localhost を ngrok proxy 経由で Slack に露出

@@ -5,6 +5,7 @@
   "main": "bot.js",
   "private": true,
   "scripts": {
+    "postinstall": "test -e .env || cp .env.template .env",
     "start": "nodemon --config .nodemon.json"
   },
   "dependencies": {
