@@ -38,7 +38,7 @@ module.exports = function(controller) {
       state.type = STARTING;
       const matches = message.text.match(/(\d+)分後/m);
       const starting_period_seconds =
-        (matches[1] && parseInt(matches[1]) * 60) || // If matched, matches[0] has whole matched segment
+        (matches && parseInt(matches[1]) * 60) || // If matched, matches[0] has whole matched segment
         DEFAULT_STARTING_PERIOD_SECONDS;
       setTimeout(async () => {
         await bot.changeContext(message.reference);
