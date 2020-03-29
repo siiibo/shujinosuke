@@ -213,13 +213,14 @@ module.exports = function(controller) {
     /終了|リセット|reset/g,
     "direct_mention",
     async (bot, message) => {
+      const state_dump = JSON.stringify(state, null, 2);
+      state = Object.assign(state, INITIAL_STATE);
       await bot.say(`
 リセットします。直前の状態は以下のようになっていました:
 \`\`\`
-${JSON.stringify(state, null, 2)}
+${state_dump}
 \`\`\`
 `);
-      state = Object.assign(state, INITIAL_STATE);
     }
   );
 
