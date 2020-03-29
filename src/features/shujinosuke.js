@@ -7,7 +7,7 @@ const STARTED = "started";
 const DEFAULT_STARTING_PERIOD_SECONDS = 300;
 const COMMENT_PERIOD_SECONDS = 120;
 const ENDING_PERIOD_SECONDS = 300;
-let state = {
+const INITIAL_STATE = {
   type: SLEEPING,
   members: {
     waiting: [],
@@ -15,6 +15,7 @@ let state = {
     done: []
   }
 };
+let state = INITIAL_STATE;
 
 module.exports = function(controller) {
   controller.ready(async () => {
@@ -116,10 +117,7 @@ module.exports = function(controller) {
   });
 
   controller.on("end_session", async (bot, message) => {
-    state = Object.assign(state, {
-      type: SLEEPING,
-      members: { waiting: [], assigned: null, done: [] }
-    });
+    state = Object.assign(state, INITIAL_STATE);
     await bot.say(`
 :stopwatch: 時間になりました！ みなさんご協力ありがとうございました。 :bow:
 :rainbow: リフレッシュして、業務に戻りましょう！ :notes:
