@@ -84,10 +84,10 @@ module.exports = function(controller) {
 :fast_forward: "@Shujinosuke スキップ" で後回しにもできます。
 `);
     } else {
-      state = {
+      state = Object.assign(state, {
         type: SLEEPING,
         members: { waiting: [], assigned: null, done: [] }
-      };
+      });
       await bot.say(
         ":rainbow: みなさんありがとうございました。今週も頑張っていきましょう！ :notes:"
       );

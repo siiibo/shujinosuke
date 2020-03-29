@@ -5,28 +5,24 @@
 // This is the main file for the shujinosuke bot.
 
 // Import Botkit's core features
-const { Botkit } = require("botkit");
-const { BotkitCMSHelper } = require("botkit-plugin-cms");
+import { Botkit } from "botkit";
+import { BotkitCMSHelper } from "botkit-plugin-cms";
 
 // Import a platform-specific adapter for slack.
 
-const {
+import {
   SlackAdapter,
   SlackMessageTypeMiddleware,
   SlackEventMiddleware
-} = require("botbuilder-adapter-slack");
+} from "botbuilder-adapter-slack";
 
-const { MongoDbStorage } = require("botbuilder-storage-mongodb");
-
-// Load process.env values from .env file
-if (process.env.NODE_ENV !== "production") require("dotenv").config();
+// Load process.env values from .env file in development
+if (process.env.NODE_ENV !== "production") {
+  import dotenv from ("dotenv")
+  dotenv.config();
+}
 
 let storage = null;
-if (process.env.MONGO_URI) {
-  storage = mongoStorage = new MongoDbStorage({
-    url: process.env.MONGO_URI
-  });
-}
 
 const adapter = new SlackAdapter({
   // parameters used to secure webhook endpoint
