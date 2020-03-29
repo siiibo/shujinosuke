@@ -122,7 +122,7 @@ module.exports = function(controller) {
     });
     await bot.say(`
 :stopwatch: 時間になりました！ みなさんご協力ありがとうございました。 :bow:
-:rainbow: リフレッシュして、業務に戻りましょう！ :bow:
+:rainbow: リフレッシュして、業務に戻りましょう！ :notes:
 `);
   });
 
