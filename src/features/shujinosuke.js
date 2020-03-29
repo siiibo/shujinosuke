@@ -1,10 +1,14 @@
+import moment from "moment";
+moment.locale("ja");
+
 const SLEEPING = "sleeping";
 const STARTING = "starting";
 const STARTED = "started";
-const STARTING_PERIOD_SECONDS = 10;
+const DEFAULT_STARTING_PERIOD_SECONDS = 300;
 const COMMENT_PERIOD_SECONDS = 10;
 let state = {
   type: SLEEPING,
+  starting_period_seconds: DEFAULT_STARTING_PERIOD_SECONDS,
   members: {
     waiting: [],
     assigned: null,
@@ -30,7 +34,10 @@ module.exports = function(controller) {
       setTimeout(async () => {
         await bot.changeContext(message.reference);
         controller.trigger("continue_session", bot, message);
-      }, STARTING_PERIOD_SECONDS * 1000);
+      }, state.starting_period_seconds * 1000);
+      const readable_starting_period = moment
+        .duration(state.starting_period_seconds, "seconds")
+        .humanize();
       await bot.reply(message, {
         blocks: [
           {
@@ -38,7 +45,7 @@ module.exports = function(controller) {
             text: {
               type: "mrkdwn",
               text: `
-:spiral_calendar_pad: ${STARTING_PERIOD_SECONDS}秒後に週次定例を始めます。
+:spiral_calendar_pad: ${readable_starting_period}後に週次定例を始めます。
 :mega: 参加者は「:rocket: 参加」ボタンをクリックか、"@Shujinosuke 参加"と返信！
 :writing_hand: 各自レポートを下書きしておいてください！ 始まったら指名していきます。
 (:warning: ちなみに私は物覚えが悪いので、妙な操作をされると記憶をなくします :boom:)
