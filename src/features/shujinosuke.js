@@ -97,8 +97,6 @@ module.exports = function(controller) {
       state.type = STARTED;
       await bot.say(`
 :stopwatch: 時間になりました。では<@${state.members.assigned}>お願いします！
-:pencil: "@Shujinosuke レポート: 先週から注力してうまくいったこと（＋新たな知見）..."
-    のように「レポート」という単語を含めて私に@付きで返信してください。
 :fast_forward: "@Shujinosuke スキップ" で後回しにもできます。
 `);
     } else {
@@ -138,32 +136,32 @@ module.exports = function(controller) {
     await join(bot, message);
   });
 
-  controller.hears(
-    /レポート/g,
-    "direct_mention,mention",
-    async (bot, message) => {
-      if (state.type === STARTED && message.user === state.members.assigned) {
-        state.members.done.push(state.members.assigned);
-        state.members.assigned = undefined;
-        setTimeout(async () => {
-          await bot.changeContext(message.reference);
-          controller.trigger("continue_session", bot, message);
-        }, COMMENT_PERIOD_SECONDS * 1000);
-        const readable_comment_period = moment
-          .duration(COMMENT_PERIOD_SECONDS, "seconds")
-          .humanize();
-        await bot.replyInThread(
-          message,
-          `
+  controller.on("message", async (bot, message) => {
+    if (
+      state.type === STARTED &&
+      message.user === state.members.assigned &&
+      !message.text.match(/スキップ/)
+    ) {
+      state.members.done.push(state.members.assigned);
+      state.members.assigned = undefined;
+      setTimeout(async () => {
+        await bot.changeContext(message.reference);
+        controller.trigger("continue_session", bot, message);
+      }, COMMENT_PERIOD_SECONDS * 1000);
+      const readable_comment_period = moment
+        .duration(COMMENT_PERIOD_SECONDS, "seconds")
+        .humanize();
+      await bot.replyInThread(
+        message,
+        `
 :+1: ありがとうございます！
 :pencil: ${readable_comment_period}ほど時間を取ります。皆さんコメントや質問をどうぞ！
 (時間が来たあとも続けて構いません)
 (チャンネルを読みやすく保つため、「以下にも投稿する：<#${message.channel}>」は使わないようにお願いします)
 `
-        );
-      }
+      );
     }
-  );
+  });
 
   controller.hears(
     /スキップ/g,
@@ -174,8 +172,6 @@ module.exports = function(controller) {
         state.members.assigned = state.members.waiting.shift();
         await bot.say(`
 :ok: では<@${state.members.assigned}>お願いします！
-:pencil: "@Shujinosuke レポート: 先週から注力してうまくいったこと（＋新たな知見）..."
-    のように「レポート」という単語を含めて私に@付きで返信してください。
 `);
       }
     }
@@ -186,8 +182,6 @@ module.exports = function(controller) {
       if (state.members.assigned) {
         await bot.say(`
 :point_right: 今は<@${state.members.assigned}>の番です。
-:pencil: "@Shujinosuke レポート: 先週から注力してうまくいったこと（＋新たな知見）..."
-    のように「レポート」という単語を含めて私に@付きで返信してください。
 :fast_forward: "@Shujinosuke スキップ" で後回しにもできます。
 `);
       } else {
@@ -204,14 +198,10 @@ module.exports = function(controller) {
               `:point_up: 今は<@${latest_assigned}>のレポートをみんなで読んでいます。`
             );
           }
-        } else {
-          if (next_up) {
-            await bot.say(
-              `:point_down: 最初は<@${next_up}>なので準備お願いします。`
-            );
-          } else {
-            await bot.say(`:mega: 現在参加受付中です。`);
-          }
+        } else if (next_up) {
+          await bot.say(
+            `:point_down: 最初は<@${next_up}>なので準備お願いします。`
+          );
         }
       }
     }
