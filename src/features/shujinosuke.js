@@ -64,11 +64,11 @@ module.exports = function(controller) {
               type: "mrkdwn",
               text: `
 *先週から注力してうまくいったこと（＋新たな知見）*
-* ...
+...
 *苦戦していること（助けがいる場合はその旨）*
-* ...
+...
 *来週にかけて注力すること*
-* ...
+...
 `
             }
           },
@@ -147,7 +147,7 @@ module.exports = function(controller) {
         state.members.assigned = undefined;
         setTimeout(async () => {
           await bot.changeContext(message.reference);
-          controller.trigger("continue_session", bot);
+          controller.trigger("continue_session", bot, message);
         }, COMMENT_PERIOD_SECONDS * 1000);
         const readable_comment_period = moment
           .duration(COMMENT_PERIOD_SECONDS, "seconds")
@@ -182,13 +182,26 @@ module.exports = function(controller) {
   );
 
   controller.hears(/誰/g, "direct_mention,mention", async (bot, message) => {
-    if (state.type === STARTED && state.members.assigned) {
-      await bot.say(`
+    if (state.type === STARTED) {
+      if (state.members.assigned) {
+        await bot.say(`
 :point_right: 今は<@${state.members.assigned}>の番です。
 :pencil: "@Shujinosuke レポート: 先週から注力してうまくいったこと（＋新たな知見）..."
     のように「レポート」という単語を含めて私に@付きで返信してください。
 :fast_forward: "@Shujinosuke スキップ" で後回しにもできます。
 `);
+      } else {
+        const latest_assigned = state.members.done.slice(-1)[0];
+        const next_up = state.members.waiting[0];
+        let message = "";
+        if (latest_assigned) {
+          message += `:point_up: 今は<@${latest_assigned}>のレポートをみんなで読んでいます。`;
+        }
+        if (next_up) {
+          message += `\n:point_down: 次は<@${next_up}>なので準備お願いします。`;
+        }
+        await bot.say(message);
+      }
     }
   });
 
