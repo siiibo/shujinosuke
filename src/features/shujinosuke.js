@@ -30,9 +30,10 @@ module.exports = function(controller) {
   controller.hears(/開始/g, "direct_mention", async (bot, message) => {
     if (state.type === SLEEPING) {
       state.type = STARTING;
-      const matches = message.text.match(/(\d+)分後/g);
+      const matches = message.text.match(/(\d+)分後/m);
       const starting_period_seconds =
-        (matches[0] && matches[0] * 60) || DEFAULT_STARTING_PERIOD_SECONDS;
+        (matches[1] && parseInt(matches[1]) * 60) || // If matched, matches[0] has whole matched segment
+        DEFAULT_STARTING_PERIOD_SECONDS;
       setTimeout(async () => {
         await bot.changeContext(message.reference);
         controller.trigger("continue_session", bot, message);
