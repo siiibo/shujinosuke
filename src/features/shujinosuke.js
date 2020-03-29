@@ -7,7 +7,7 @@ const STARTED = "started";
 const DEFAULT_STARTING_PERIOD_SECONDS = 300;
 const COMMENT_PERIOD_SECONDS = 120;
 const ENDING_PERIOD_SECONDS = 300;
-const INITIAL_STATE = {
+let state = {
   type: SLEEPING,
   members: {
     waiting: [],
@@ -15,7 +15,6 @@ const INITIAL_STATE = {
     done: []
   }
 };
-let state = INITIAL_STATE;
 
 async function join(bot, message) {
   if ([STARTING, STARTED].includes(state.type) && message.user) {
@@ -121,7 +120,8 @@ module.exports = function(controller) {
   });
 
   controller.on("end_session", async (bot, message) => {
-    state = INITIAL_STATE;
+    state.type = SLEEPING;
+    state.members = { waiting: [], assigned: null, done: [] };
     await bot.say(`
 :stopwatch: 時間になりました！ みなさんご協力ありがとうございました。 :bow:
 :rainbow: リフレッシュして、業務に戻りましょう！ :notes:
@@ -214,7 +214,10 @@ module.exports = function(controller) {
     "direct_mention",
     async (bot, message) => {
       const state_dump = JSON.stringify(state, null, 2);
-      state = INITIAL_STATE;
+      state = {
+        type: SLEEPING,
+        members: { waiting: [], assigned: null, done: [] }
+      };
       await bot.say(`
 リセットします。直前の状態は以下のようになっていました:
 \`\`\`
