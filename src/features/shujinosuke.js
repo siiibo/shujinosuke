@@ -241,11 +241,15 @@ ${JSON.stringify(state, null, 2)}
     "ping",
     "direct_mention,direct_message",
     async (bot, message) => {
-      await bot.replyEphemeral(`pong!
+      await bot.replyEphemeral(
+        message,
+        `
+pong!
 \`\`\`
 ${JSON.stringify(state, null, 2)}
 \`\`\`
-`);
+`
+      );
     }
   );
 };
