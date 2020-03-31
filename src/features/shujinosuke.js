@@ -237,7 +237,7 @@ ${JSON.stringify(state, null, 2)}
 `);
   });
 
-  controller.hears("ping", "direct_mention", async (bot, message) => {
+  controller.hears("ping", "message", async (bot, message) => {
     await bot.replyEphemeral(`pong!
 \`\`\`
 ${JSON.stringify(state, null, 2)}
