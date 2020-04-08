@@ -106,7 +106,10 @@ module.exports = function (controller) {
         // Do nothing; end_session timer should be working
       } else {
         // No participants
-        state.type === SLEEPING;
+        state.type = SLEEPING;
+        await bot.say(`
+:fast_forward: 終了します。
+`);
       }
     }
   });
