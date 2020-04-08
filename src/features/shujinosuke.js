@@ -50,6 +50,7 @@ module.exports = function (controller) {
 :clipboard: 以下をコピーしてレポートをまとめ、できたらどんどん投稿しましょう！
 :pencil: 「*@Shujinosuke レポート*」の部分も含めるようにお願いします。
 :stopwatch: ${readable_check_timeout}ごとにリマインドしていきます。
+:question: 私がちゃんと反応しなかった場合、削除して投稿し直してみてください。
 `,
             },
           },
@@ -101,6 +102,7 @@ module.exports = function (controller) {
         await bot.say(`
 :stopwatch: あと${remaining_count}人です。
 :fast_forward: 「*@Shujinosuke レポート*」を含めて投稿してください！
+:question: 私がちゃんと反応しなかった場合、削除して投稿し直してみてください。
 `);
       } else if (state.members.done.length > 0) {
         // Do nothing; end_session timer should be working
@@ -196,6 +198,7 @@ module.exports = function (controller) {
         await bot.say(`
 :point_right: 残りは${remaining}です。
 :fast_forward: 急用ができたら「*@Shujinosuke キャンセル*」もできます。
+:question: 私がちゃんと反応しなかった場合、削除して投稿し直してみてください。
 `);
       } else {
         await bot.say(":point_up: 今は全体連絡とレポートレビューの時間です。");
