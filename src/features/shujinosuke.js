@@ -91,16 +91,23 @@ module.exports = function (controller) {
   });
 
   controller.on("continue_session", async (bot, message) => {
-    if (state.type === STARTED && state.members.waiting.length > 0) {
-      const remaining_count = state.members.waiting.length;
-      setTimeout(async () => {
-        await bot.changeContext(message.reference);
-        controller.trigger("continue_session", bot, message);
-      }, CHECK_TIMEOUT_SECONDS * 1000);
-      await bot.say(`
+    if (state.type === STARTED) {
+      if (state.members.waiting.length > 0) {
+        const remaining_count = state.members.waiting.length;
+        setTimeout(async () => {
+          await bot.changeContext(message.reference);
+          controller.trigger("continue_session", bot, message);
+        }, CHECK_TIMEOUT_SECONDS * 1000);
+        await bot.say(`
 :stopwatch: あと${remaining_count}人です。
 :fast_forward: "@Shujinosuke レポート"を含めて投稿してください！
 `);
+      } else if (state.members.done.length > 0) {
+        // Do nothing; end_session timer should be working
+      } else {
+        // No participants
+        state.type === SLEEPING;
+      }
     }
   });
 
@@ -132,7 +139,7 @@ module.exports = function (controller) {
       if (state.type === STARTED) {
         state.members.done.push(message.user);
         state.members.waiting = state.members.waiting.filter(
-          (value, _index, _array) => value === message.user
+          (value, _index, _array) => value !== message.user
         );
         await bot.replyInThread(
           message,
@@ -167,7 +174,7 @@ module.exports = function (controller) {
     async (bot, message) => {
       if (state.type === STARTED) {
         state.members.waiting = state.members.waiting.filter(
-          (value, _index, _array) => value === message.user
+          (value, _index, _array) => value !== message.user
         );
         await bot.reply(
           message,
