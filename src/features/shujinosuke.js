@@ -46,9 +46,9 @@ module.exports = function (controller) {
               type: "mrkdwn",
               text: `
 :spiral_calendar_pad: 週次定例を始めます！
-:mega: 参加者は「:rocket: 参加」ボタンをクリックか、「*@Shujinosuke 参加*」と返信！
+:mega: 参加者は「:rocket: 参加」ボタンをクリックか、「 *@Shujinosuke 参加* 」と返信！
 :clipboard: 以下をコピーしてレポートをまとめ、できたらどんどん投稿しましょう！
-:pencil: 「*@Shujinosuke レポート*」の部分も含めるようにお願いします。
+:pencil: 「 *@Shujinosuke レポート* 」の部分も含めるようにお願いします。
 :stopwatch: ${readable_check_timeout}ごとにリマインドしていきます。
 :question: 私がちゃんと反応しなかった場合、削除して投稿し直してみてください。
 `,
@@ -101,7 +101,7 @@ module.exports = function (controller) {
         }, CHECK_TIMEOUT_SECONDS * 1000);
         await bot.say(`
 :stopwatch: あと${remaining_count}人です。
-:fast_forward: 「*@Shujinosuke レポート*」を含めて投稿してください！
+:fast_forward: 「 *@Shujinosuke レポート* 」を含めて投稿してください！
 :question: 私がちゃんと反応しなかった場合、削除して投稿し直してみてください。
 `);
       } else if (state.members.done.length > 0) {
@@ -197,7 +197,7 @@ module.exports = function (controller) {
           .join(", ");
         await bot.say(`
 :point_right: 残りは${remaining}です。
-:fast_forward: 急用ができたら「*@Shujinosuke キャンセル*」もできます。
+:fast_forward: 急用ができたら「 *@Shujinosuke キャンセル* 」もできます。
 :question: 私がちゃんと反応しなかった場合、削除して投稿し直してみてください。
 `);
       } else {
