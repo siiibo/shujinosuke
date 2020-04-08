@@ -2,26 +2,22 @@ const moment = require("moment");
 moment.locale("ja");
 
 const SLEEPING = "sleeping";
-const STARTING = "starting";
 const STARTED = "started";
-const DEFAULT_STARTING_PERIOD_SECONDS = 300;
-const COMMENT_PERIOD_SECONDS = 120;
-const ENDING_PERIOD_SECONDS = 300;
+const CHECK_TIMEOUT_SECONDS = 10;
+const ENDING_PERIOD_SECONDS = 10;
 let state = {
   type: SLEEPING,
   members: {
     waiting: [],
-    assigned: null,
-    done: []
-  }
+    done: [],
+  },
 };
 
 async function join(bot, message) {
-  if ([STARTING, STARTED].includes(state.type) && message.user) {
+  if (state.type == STARTED && message.user) {
     if (
       state.members.waiting.includes(message.user) ||
-      state.members.done.includes(message.user) ||
-      state.members.assigned === message.user
+      state.members.done.includes(message.user)
     ) {
       await bot.replyEphemeral(message, "(大丈夫、参加済みですよ :+1:)");
     } else {
@@ -31,20 +27,16 @@ async function join(bot, message) {
   }
 }
 
-module.exports = function(controller) {
+module.exports = function (controller) {
   controller.hears(/開始/g, "direct_mention", async (bot, message) => {
     if (state.type === SLEEPING) {
-      state.type = STARTING;
-      const matches = message.text.match(/(\d+)分後/m);
-      const starting_period_seconds =
-        (matches && parseInt(matches[1]) * 60) || // If matched, matches[0] has whole matched segment
-        DEFAULT_STARTING_PERIOD_SECONDS;
+      state.type = STARTED;
       setTimeout(async () => {
         await bot.changeContext(message.reference);
         controller.trigger("continue_session", bot, message);
-      }, starting_period_seconds * 1000);
-      const readable_starting_period = moment
-        .duration(starting_period_seconds, "seconds")
+      }, CHECK_TIMEOUT_SECONDS * 1000);
+      const readable_check_timeout = moment
+        .duration(CHECK_TIMEOUT_SECONDS, "seconds")
         .humanize();
       await bot.reply(message, {
         blocks: [
@@ -53,28 +45,31 @@ module.exports = function(controller) {
             text: {
               type: "mrkdwn",
               text: `
-:spiral_calendar_pad: ${readable_starting_period}後に週次定例を始めます。
+:spiral_calendar_pad: 週次定例を始めます！
 :mega: 参加者は「:rocket: 参加」ボタンをクリックか、"@Shujinosuke 参加"と返信！
-:clipboard: 以下をコピーしてレポートを下書きしてください！ 始まったら指名していきます。
-`
-            }
+:clipboard: 以下をコピーしてレポートをまとめ、できたらどんどん投稿しましょう！
+:pencil: "@Shujinosuke レポート"の部分は消さないようにお願いします。
+:stopwatch: ${readable_check_timeout}ごとにリマインドしていきます。
+`,
+            },
           },
           {
-            type: "divider"
+            type: "divider",
           },
           {
             type: "section",
             text: {
               type: "mrkdwn",
               text: `
+@Shujinosuke レポート
 *先週から注力してうまくいったこと（＋新たな知見）*
 ...
 *苦戦していること（助けがいる場合はその旨）*
 ...
 *来週にかけて注力すること*
 ...
-`
-            }
+`,
+            },
           },
           {
             type: "actions",
@@ -84,37 +79,27 @@ module.exports = function(controller) {
                 text: {
                   type: "plain_text",
                   text: ":rocket: 参加",
-                  emoji: true
+                  emoji: true,
                 },
-                value: "join"
-              }
-            ]
-          }
-        ]
+                value: "join",
+              },
+            ],
+          },
+        ],
       });
     }
   });
 
   controller.on("continue_session", async (bot, message) => {
-    state.members.assigned = state.members.waiting.shift();
-    if ([STARTING, STARTED].includes(state.type) && state.members.assigned) {
-      state.type = STARTED;
-      await bot.say(`
-:stopwatch: 時間になりました。では<@${state.members.assigned}>お願いします！
-:fast_forward: "@Shujinosuke スキップ" で後回しにもできます。
-`);
-    } else {
+    if (state.type === STARTED && state.members.waiting.length > 0) {
+      const remaining_count = state.members.waiting.length;
       setTimeout(async () => {
         await bot.changeContext(message.reference);
-        controller.trigger("end_session", bot, message);
-      }, ENDING_PERIOD_SECONDS * 1000);
-      const readable_ending_period = moment
-        .duration(ENDING_PERIOD_SECONDS, "seconds")
-        .humanize();
+        controller.trigger("continue_session", bot, message);
+      }, CHECK_TIMEOUT_SECONDS * 1000);
       await bot.say(`
-:+1: 全員のレポートが完了しました！
-:stopwatch: それでは、${readable_ending_period}ほど時間を取りますので、全体連絡のある方はお願いします。
-:eyes: まだ読み終わっていないレポートがあれば、読んでコメントしましょう！
+:stopwatch: あと${remaining_count}人です。
+:fast_forward: "@Shujinosuke レポート"を含めて投稿してください！
 `);
     }
   });
@@ -122,7 +107,7 @@ module.exports = function(controller) {
   controller.on("end_session", async (bot, message) => {
     if (state.type === STARTED) {
       state.type = SLEEPING;
-      state.members = { waiting: [], assigned: null, done: [] };
+      state.members = { waiting: [], done: [] };
       await bot.say(`
 :stopwatch: 時間になりました！ みなさんご協力ありがとうございました。 :bow:
 :rainbow: リフレッシュして、業務に戻りましょう！ :notes:
@@ -140,73 +125,70 @@ module.exports = function(controller) {
     await join(bot, message);
   });
 
-  controller.on("message", async (bot, message) => {
-    if (
-      state.type === STARTED &&
-      message.user === state.members.assigned &&
-      !message.text.match(/スキップ/)
-    ) {
-      state.members.done.push(state.members.assigned);
-      state.members.assigned = undefined;
-      setTimeout(async () => {
-        await bot.changeContext(message.reference);
-        controller.trigger("continue_session", bot, message);
-      }, COMMENT_PERIOD_SECONDS * 1000);
-      const readable_comment_period = moment
-        .duration(COMMENT_PERIOD_SECONDS, "seconds")
-        .humanize();
-      await bot.replyInThread(
-        message,
-        `
-:+1: ありがとうございます！
-:pencil: ${readable_comment_period}ほど時間を取ります。皆さんコメントや質問をどうぞ！
-(時間が来たあとも続けて構いません)
-(チャンネルを読みやすく保つため、「以下にも投稿する：<#${message.channel}>」は使わないようにお願いします)
-`
-      );
-    }
-  });
-
   controller.hears(
-    /スキップ/g,
+    /レポート/g,
     "direct_mention,mention",
     async (bot, message) => {
-      if (state.type === STARTED && state.members.assigned) {
-        state.members.waiting.push(state.members.assigned);
-        state.members.assigned = state.members.waiting.shift();
-        await bot.say(`
-:ok: では<@${state.members.assigned}>お願いします！
+      if (state.type === STARTED) {
+        state.members.done.push(message.user);
+        state.members.waiting = state.members.waiting.filter(
+          (value, _index, _array) => value === message.user
+        );
+        await bot.replyInThread(
+          message,
+          `
+:+1: ありがとうございます！
+:pencil: 皆さんコメントや質問をどうぞ！
+(チャンネルを読みやすく保つため、「以下にも投稿する：<#${message.channel}>」は使わないようにお願いします)
+`
+        );
+        if (state.members.waiting.length === 0) {
+          await bot.changeContext(message.reference);
+          setTimeout(async () => {
+            await bot.changeContext(message.reference);
+            controller.trigger("end_session", bot, message);
+          }, ENDING_PERIOD_SECONDS * 1000);
+          const readable_ending_period = moment
+            .duration(ENDING_PERIOD_SECONDS, "seconds")
+            .humanize();
+          await bot.say(`
+:+1: 全員のレポートが完了しました！
+:stopwatch: それでは、${readable_ending_period}ほど時間を取りますので、全体連絡のある方はお願いします。
+:eyes: また、この時間で皆さんのレポートを読んでコメントしましょう！
 `);
+        }
+      }
+    }
+  );
+
+  controller.hears(
+    /キャンセル/g,
+    "direct_mention,mention",
+    async (bot, message) => {
+      if (state.type === STARTED) {
+        state.members.waiting = state.members.waiting.filter(
+          (value, _index, _array) => value === message.user
+        );
+        await bot.reply(
+          message,
+          `:wave: <@${message.user}> がキャンセルしました`
+        );
       }
     }
   );
 
   controller.hears(/誰/g, "direct_mention,mention", async (bot, message) => {
     if (state.type === STARTED) {
-      if (state.members.assigned) {
+      if (state.members.waiting.length > 0) {
+        const remaining = state.members.waiting
+          .map((value, _index, _array) => `<@${value}>`)
+          .join(", ");
         await bot.say(`
-:point_right: 今は<@${state.members.assigned}>の番です。
-:fast_forward: "@Shujinosuke スキップ" で後回しにもできます。
+:point_right: 残りは${remaining}です。
+:fast_forward: 急用ができたら"@Shujinosuke キャンセル"でキャンセルもできます。
 `);
       } else {
-        const latest_assigned = state.members.done.slice(-1)[0];
-        const next_up = state.members.waiting[0];
-        if (latest_assigned) {
-          if (next_up) {
-            await bot.say(`
-:point_up: 今は<@${latest_assigned}>のレポートをみんなで読んでいます。
-:point_down: 次は<@${next_up}>なので準備お願いします。
-`);
-          } else {
-            await bot.say(
-              `:point_up: 今は<@${latest_assigned}>のレポートをみんなで読んでいます。`
-            );
-          }
-        } else if (next_up) {
-          await bot.say(
-            `:point_down: 最初は<@${next_up}>なので準備お願いします。`
-          );
-        }
+        await bot.say(":point_up: 今は全体連絡とレポートレビューの時間です。");
       }
     }
   });
@@ -218,7 +200,7 @@ module.exports = function(controller) {
       const state_dump = JSON.stringify(state, null, 2);
       state = {
         type: SLEEPING,
-        members: { waiting: [], assigned: null, done: [] }
+        members: { waiting: [], done: [] },
       };
       await bot.say(`
 リセットします。直前の状態は以下のようになっていました:
