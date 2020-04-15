@@ -3,7 +3,7 @@ moment.locale("ja");
 
 const SLEEPING = "sleeping";
 const STARTED = "started";
-const CHECK_TIMEOUT_SECONDS = 120;
+const CHECK_TIMEOUT_SECONDS = 1200;
 const ENDING_PERIOD_SECONDS = 300;
 let state = {
   type: SLEEPING,
