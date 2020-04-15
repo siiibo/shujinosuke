@@ -28,11 +28,7 @@ async function join(bot, message) {
 }
 
 async function check_all_reported(controller, bot, message) {
-  if (
-    state.type === STARTED &&
-    state.members.waiting.length === 0 &&
-    state.members.done.length > 0
-  ) {
+  if (state.type === STARTED && state.members.waiting.length === 0) {
     await bot.changeContext(message.reference);
     setTimeout(async () => {
       await bot.changeContext(message.reference);
@@ -42,10 +38,10 @@ async function check_all_reported(controller, bot, message) {
       .duration(ENDING_PERIOD_SECONDS, "seconds")
       .humanize();
     await bot.say(`
-    :+1: 全員のレポートが完了しました！
-    :stopwatch: それでは、${readable_ending_period}ほど時間を取りますので、全体連絡のある方はお願いします。
-    :eyes: また、この時間で皆さんのレポートを読んでコメントしましょう！（もちろん時間が過ぎたあとも続けて:ok:）
-    `);
+:+1: 全員のレポートが完了しました！
+:stopwatch: それでは、${readable_ending_period}ほど時間を取りますので、全体連絡のある方はお願いします。
+:eyes: また、この時間で皆さんのレポートを読んでコメントしましょう！（もちろん時間が過ぎたあとも続けて:ok:）
+`);
   }
 }
 
@@ -70,7 +66,7 @@ module.exports = function (controller) {
 :spiral_calendar_pad: 週次定例を始めます！
 :mega: 参加者は「:rocket: 参加」ボタンをクリックか、「 *@Shujinosuke 参加* 」と返信！
 :clipboard: 以下をコピーしてレポートをまとめ、できたらどんどん投稿しましょう！
-:stopwatch: ${readable_check_timeout}後にリマインドし、全員投稿したら最後に全体連絡の時間を取ります。
+:stopwatch: ${readable_check_timeout}後にリマインドし、全員投稿したら全体連絡の時間に移ります。
 :question: 私がちゃんと反応しなかった場合、投稿を一度削除して投稿し直してみてください。
 `,
             },
@@ -117,8 +113,7 @@ module.exports = function (controller) {
       if (state.members.waiting.length > 0) {
         const remaining_count = state.members.waiting.length;
         await bot.say(`
-:stopwatch: あと${remaining_count}人です。
-:fast_forward: 「 *@Shujinosuke レポート* 」を含めて投稿してください！
+:stopwatch: あと${remaining_count}人です。全体連絡を先に始めていてもOKです。
 :question: 私がちゃんと反応しなかった場合、削除して投稿し直してみてください。
 `);
       } else if (state.members.done.length > 0) {
