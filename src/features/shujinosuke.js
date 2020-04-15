@@ -46,7 +46,114 @@ async function check_all_reported(controller, bot, message) {
 }
 
 module.exports = function (controller) {
-  controller.hears("開始", "direct_mention", async (bot, message) => {
+  // Message patterns should basically come first.
+
+  // Pickup reports. This is the most prioritized pattern in the session.
+  controller.hears(
+    [
+      /^レポート/,
+      /<@U010MMQGD96> +レポート/,
+      /先週から注力してうまくいったこと/,
+      /苦戦していること/,
+      /来週にかけて注力すること/,
+    ],
+    "direct_mention,mention,message",
+    async (bot, message) => {
+      if (state.type === STARTED) {
+        state.members.done.push(message.user);
+        state.members.waiting = state.members.waiting.filter(
+          (value, _index, _array) => value !== message.user
+        );
+        await bot.replyInThread(
+          message,
+          `
+:+1: ありがとうございます！
+:pencil: 皆さんコメントや質問をどうぞ！
+(チャンネルを読みやすく保つため、「以下にも投稿する：<#${message.channel}>」は使わないようにお願いします)
+`
+        );
+        await check_all_reported(controller, bot, message);
+      }
+    }
+  );
+
+  controller.hears(/^参加$/, "direct_mention", async (bot, message) => {
+    await join(bot, message);
+  });
+
+  controller.hears(/^キャンセル$/, "direct_mention", async (bot, message) => {
+    if (state.type === STARTED) {
+      state.members.waiting = state.members.waiting.filter(
+        (value, _index, _array) => value !== message.user
+      );
+      await bot.reply(
+        message,
+        `:wave: <@${message.user}> がキャンセルしました`
+      );
+      await check_all_reported(controller, bot, message);
+    }
+  });
+
+  controller.hears(/誰？?$/, "direct_mention", async (bot, message) => {
+    if (state.type === STARTED) {
+      if (state.members.waiting.length > 0) {
+        const remaining = state.members.waiting
+          .map((value, _index, _array) => `<@${value}>`)
+          .join(", ");
+        await bot.say(`
+:point_right: 残りは${remaining}です。
+:fast_forward: 急用ができたら「 *@Shujinosuke キャンセル* 」もできます。
+:question: 私がちゃんと反応しなかった場合、削除して投稿し直してみてください。
+`);
+      } else {
+        await bot.say(":point_up: 今は全体連絡とレポートレビューの時間です。");
+      }
+    }
+  });
+
+  controller.hears(
+    /^(終了|リセット|reset)$/,
+    "direct_mention",
+    async (bot, message) => {
+      const state_dump = JSON.stringify(state, null, 2);
+      state = {
+        type: SLEEPING,
+        members: { waiting: [], done: [] },
+      };
+      await bot.say(`
+リセットします。直前の状態は以下のようになっていました:
+\`\`\`
+${state_dump}
+\`\`\`
+`);
+    }
+  );
+
+  controller.hears(/^status$/, "direct_mention", async (bot, message) => {
+    await bot.say(`
+\`\`\`
+${JSON.stringify(state, null, 2)}
+\`\`\`
+`);
+  });
+
+  controller.hears(
+    /^ping$/,
+    "direct_mention,direct_message",
+    async (bot, message) => {
+      await bot.replyEphemeral(
+        message,
+        `
+pong!
+\`\`\`
+${JSON.stringify(state, null, 2)}
+\`\`\`
+`
+      );
+    }
+  );
+
+  controller.hears(/^開始$/, "direct_mention", async (bot, message) => {
     if (state.type === SLEEPING) {
       state.type = STARTED;
       setTimeout(async () => {
@@ -144,110 +251,4 @@ module.exports = function (controller) {
       await join(bot, message);
     }
   });
-
-  controller.hears("参加", "direct_mention", async (bot, message) => {
-    await join(bot, message);
-  });
-
-  controller.hears(
-    [
-      /^レポート/,
-      /<@U010MMQGD96> +レポート/,
-      /先週から注力してうまくいったこと/,
-    ],
-    "direct_mention,mention,message",
-    async (bot, message) => {
-      if (state.type === STARTED) {
-        state.members.done.push(message.user);
-        state.members.waiting = state.members.waiting.filter(
-          (value, _index, _array) => value !== message.user
-        );
-        await bot.replyInThread(
-          message,
-          `
-:+1: ありがとうございます！
-:pencil: 皆さんコメントや質問をどうぞ！
-(チャンネルを読みやすく保つため、「以下にも投稿する：<#${message.channel}>」は使わないようにお願いします)
-`
-        );
-        await check_all_reported(controller, bot, message);
-      }
-    }
-  );
-
-  controller.hears(
-    "キャンセル",
-    "direct_mention,mention",
-    async (bot, message) => {
-      if (state.type === STARTED) {
-        state.members.waiting = state.members.waiting.filter(
-          (value, _index, _array) => value !== message.user
-        );
-        await bot.reply(
-          message,
-          `:wave: <@${message.user}> がキャンセルしました`
-        );
-        await check_all_reported(controller, bot, message);
-      }
-    }
-  );
-
-  controller.hears(/誰/g, "direct_mention,mention", async (bot, message) => {
-    if (state.type === STARTED) {
-      if (state.members.waiting.length > 0) {
-        const remaining = state.members.waiting
-          .map((value, _index, _array) => `<@${value}>`)
-          .join(", ");
-        await bot.say(`
-:point_right: 残りは${remaining}です。
-:fast_forward: 急用ができたら「 *@Shujinosuke キャンセル* 」もできます。
-:question: 私がちゃんと反応しなかった場合、削除して投稿し直してみてください。
-`);
-      } else {
-        await bot.say(":point_up: 今は全体連絡とレポートレビューの時間です。");
-      }
-    }
-  });
-
-  controller.hears(
-    /終了|リセット|reset/g,
-    "direct_mention",
-    async (bot, message) => {
-      const state_dump = JSON.stringify(state, null, 2);
-      state = {
-        type: SLEEPING,
-        members: { waiting: [], done: [] },
-      };
-      await bot.say(`
-リセットします。直前の状態は以下のようになっていました:
-\`\`\`
-${state_dump}
-\`\`\`
-`);
-    }
-  );
-
-  controller.hears("status", "direct_mention", async (bot, message) => {
-    await bot.say(`
-\`\`\`
-${JSON.stringify(state, null, 2)}
-\`\`\`
-`);
-  });
-
-  controller.hears(
-    "ping",
-    "direct_mention,direct_message",
-    async (bot, message) => {
-      await bot.replyEphemeral(
-        message,
-        `
-pong!
-\`\`\`
-${JSON.stringify(state, null, 2)}
-\`\`\`
-`
-      );
-    }
-  );
 };
