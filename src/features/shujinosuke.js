@@ -27,8 +27,30 @@ async function join(bot, message) {
   }
 }
 
+async function check_all_reported(controller, bot, message) {
+  if (
+    state.type === STARTED &&
+    state.members.waiting.length === 0 &&
+    state.members.done.length > 0
+  ) {
+    await bot.changeContext(message.reference);
+    setTimeout(async () => {
+      await bot.changeContext(message.reference);
+      controller.trigger("end_session", bot, message);
+    }, ENDING_PERIOD_SECONDS * 1000);
+    const readable_ending_period = moment
+      .duration(ENDING_PERIOD_SECONDS, "seconds")
+      .humanize();
+    await bot.say(`
+    :+1: 全員のレポートが完了しました！
+    :stopwatch: それでは、${readable_ending_period}ほど時間を取りますので、全体連絡のある方はお願いします。
+    :eyes: また、この時間で皆さんのレポートを読んでコメントしましょう！（もちろん時間が過ぎたあとも続けて:ok:）
+    `);
+  }
+}
+
 module.exports = function (controller) {
-  controller.hears(/開始/g, "direct_mention", async (bot, message) => {
+  controller.hears("開始", "direct_mention", async (bot, message) => {
     if (state.type === SLEEPING) {
       state.type = STARTED;
       setTimeout(async () => {
@@ -48,9 +70,8 @@ module.exports = function (controller) {
 :spiral_calendar_pad: 週次定例を始めます！
 :mega: 参加者は「:rocket: 参加」ボタンをクリックか、「 *@Shujinosuke 参加* 」と返信！
 :clipboard: 以下をコピーしてレポートをまとめ、できたらどんどん投稿しましょう！
-:pencil: 「 *@Shujinosuke レポート* 」の部分も含めるようにお願いします。
-:stopwatch: ${readable_check_timeout}ごとにリマインドしていきます。
-:question: 私がちゃんと反応しなかった場合、削除して投稿し直してみてください。
+:stopwatch: ${readable_check_timeout}後にリマインドし、全員投稿したら最後に全体連絡の時間を取ります。
+:question: 私がちゃんと反応しなかった場合、投稿を一度削除して投稿し直してみてください。
 `,
             },
           },
@@ -95,10 +116,6 @@ module.exports = function (controller) {
     if (state.type === STARTED) {
       if (state.members.waiting.length > 0) {
         const remaining_count = state.members.waiting.length;
-        setTimeout(async () => {
-          await bot.changeContext(message.reference);
-          controller.trigger("continue_session", bot, message);
-        }, CHECK_TIMEOUT_SECONDS * 1000);
         await bot.say(`
 :stopwatch: あと${remaining_count}人です。
 :fast_forward: 「 *@Shujinosuke レポート* 」を含めて投稿してください！
@@ -138,8 +155,12 @@ module.exports = function (controller) {
   });
 
   controller.hears(
-    /レポート/g,
-    "direct_mention,mention",
+    [
+      /^レポート/,
+      /<@U010MMQGD96> +レポート/,
+      /先週から注力してうまくいったこと/,
+    ],
+    "direct_mention,mention,message",
     async (bot, message) => {
       if (state.type === STARTED) {
         state.members.done.push(message.user);
@@ -154,27 +175,13 @@ module.exports = function (controller) {
 (チャンネルを読みやすく保つため、「以下にも投稿する：<#${message.channel}>」は使わないようにお願いします)
 `
         );
-        if (state.members.waiting.length === 0) {
-          await bot.changeContext(message.reference);
-          setTimeout(async () => {
-            await bot.changeContext(message.reference);
-            controller.trigger("end_session", bot, message);
-          }, ENDING_PERIOD_SECONDS * 1000);
-          const readable_ending_period = moment
-            .duration(ENDING_PERIOD_SECONDS, "seconds")
-            .humanize();
-          await bot.say(`
-:+1: 全員のレポートが完了しました！
-:stopwatch: それでは、${readable_ending_period}ほど時間を取りますので、全体連絡のある方はお願いします。
-:eyes: また、この時間で皆さんのレポートを読んでコメントしましょう！（もちろん時間が過ぎたあとも続けて:ok:）
-`);
-        }
+        await check_all_reported(controller, bot, message);
       }
     }
   );
 
   controller.hears(
-    /キャンセル/g,
+    "キャンセル",
     "direct_mention,mention",
     async (bot, message) => {
       if (state.type === STARTED) {
@@ -185,6 +192,7 @@ module.exports = function (controller) {
           message,
           `:wave: <@${message.user}> がキャンセルしました`
         );
+        await check_all_reported(controller, bot, message);
       }
     }
   );
