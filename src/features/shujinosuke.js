@@ -153,7 +153,7 @@ ${JSON.stringify(state, null, 2)}
     }
   );
 
-  controller.hears(/^開始$/, "direct_mention", async (bot, message) => {
+controller.hears(/^開始$/, "direct_mention", async (bot, message) => {
     if (state.type === SLEEPING) {
       state.type = STARTED;
       setTimeout(async () => {
@@ -215,6 +215,24 @@ ${JSON.stringify(state, null, 2)}
     }
   });
 
+  controller.hears(/^ヘルプ$/, "direct_mention", async (bot, message)) => {
+    if (state.type === STARTED) {
+        // bot.sayとbot.replyの違いは何か？
+        // キーワードの一部分だけでも発言と一致していれば反応？例えば、trelloの作業ボードの添付ファイルにある画像で、「残りは誰？」に対しても反応している。
+
+      await bot.say(`
+                    :raising_hand: Shujinosukeで使えるコマンドは以下の通りです。
+                    開始              会議を開始します。
+                    終了              会議を終了します。
+                    参加              会議に参加します。
+                    キャンセル         参加を取り消します。
+                    誰？              レポート未投稿者を通知します。
+                    レポート           レポートを投稿します。
+`);
+    }
+  });
+      
+                    
   controller.on("continue_session", async (bot, message) => {
     if (state.type === STARTED) {
       if (state.members.waiting.length > 0) {
