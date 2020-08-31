@@ -215,6 +215,34 @@ ${JSON.stringify(state, null, 2)}
     }
   });
 
+  controller.hears(/^ヘルプ$/, "direct_mention", async (bot, message) => {
+    if (state.type === STARTED) {
+      await bot.reply(message, {
+        type: "section",
+        text: {
+          type: "mrkdwn",
+          text: `
+:point_down:Shujinosukeで使えるコマンドは以下の通りです:point_down:
+レポートの投稿
+`レポート` `<@U010MMQGD96> +レポート` `先週から注力してうまくいったこと` `苦戦していること` `来週にかけて注力すること`
+会議の開始
+`開始`
+会議の強制終了
+`終了` `リセット` `reset`
+会議へ参加
+`参加`
+参加の取り消し
+`キャンセル`
+レポート未投稿者の確認
+`誰？`
+shujinosukeのステータス確認
+`status`
+`,
+          },
+        });
+      }
+  });
+
   controller.on("continue_session", async (bot, message) => {
     if (state.type === STARTED) {
       if (state.members.waiting.length > 0) {
