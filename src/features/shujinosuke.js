@@ -94,7 +94,7 @@ module.exports = function (controller) {
     }
   });
 
-  controller.hears(/誰？?$/, "direct_mention", async (bot, message) => {
+  controller.hears(/誰？$/, "direct_mention", async (bot, message) => {
     if (state.type === STARTED) {
       if (state.members.waiting.length > 0) {
         const remaining = state.members.waiting
@@ -215,24 +215,66 @@ controller.hears(/^開始$/, "direct_mention", async (bot, message) => {
     }
   });
 
-  controller.hears(/^ヘルプ$/, "direct_mention", async (bot, message)) => {
+  controller.hears(/^ヘルプ$/, "direct_mention", async (bot, message) => {
     if (state.type === STARTED) {
-        // bot.sayとbot.replyの違いは何か？
-        // キーワードの一部分だけでも発言と一致していれば反応？例えば、trelloの作業ボードの添付ファイルにある画像で、「残りは誰？」に対しても反応している。
-
-      await bot.say(`
-                    :raising_hand: Shujinosukeで使えるコマンドは以下の通りです。
-                    開始              会議を開始します。
-                    終了              会議を終了します。
-                    参加              会議に参加します。
-                    キャンセル         参加を取り消します。
-                    誰？              レポート未投稿者を通知します。
-                    レポート           レポートを投稿します。
-`);
-    }
+        await bot.reply(message, {
+          blocks: [
+            {
+              type: "section",
+              text: {
+                type: "mrkdwn",
+                text: ":point_down:Shujinosukeで使えるコマンドは以下の通りです:point_down:\nレポートの投稿\n`レポート` `<@U010MMQGD96> +レポート` `先週から注力してうまくいったこと` `苦戦していること` `来週にかけて注力すること`"
+              },
+            },
+            {
+              type: "section",
+              text: {
+                type: "mrkdwn",
+                text: "会議の開始\n`開始`"
+               },
+            },
+            {
+              type: "section",
+              text: {
+                type: "mrkdwn",
+                text: "会議の強制終了\n`終了` `リセット` `reset`"
+              },
+            },
+            {
+              type: "section",
+              text: {
+                type: "mrkdwn",
+                text: "会議へ参加\n`参加`"
+              },
+            },
+            {
+              type: "section",
+              text: {
+                type: "mrkdwn",
+                text: "参加の取り消し\n`キャンセル`"
+              },
+            },
+            {
+              type: "section",
+              text: {
+                type: "mrkdwn",
+                text: "レポート未投稿者の確認\n`誰？`"
+              },
+            },
+            {
+              type: "section",
+              text: {
+                type: "mrkdwn",
+                text: "Botステータスの確認\n`status`"
+              },
+            },
+          ],
+        });
+      }
   });
-      
-                    
+
+  
+                
   controller.on("continue_session", async (bot, message) => {
     if (state.type === STARTED) {
       if (state.members.waiting.length > 0) {
