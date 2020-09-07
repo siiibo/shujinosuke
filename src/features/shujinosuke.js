@@ -214,7 +214,7 @@ controller.hears(/^開始$/, "direct_mention", async (bot, message) => {
       });
     }
   });
-
+      
   controller.hears(/^ヘルプ$/, "direct_mention", async (bot, message) => {
     if (state.type === STARTED) {
         await bot.reply(message, {
@@ -274,7 +274,6 @@ controller.hears(/^開始$/, "direct_mention", async (bot, message) => {
   });
 
   
-                
   controller.on("continue_session", async (bot, message) => {
     if (state.type === STARTED) {
       if (state.members.waiting.length > 0) {
