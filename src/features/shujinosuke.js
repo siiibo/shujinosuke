@@ -153,7 +153,7 @@ ${JSON.stringify(state, null, 2)}
     }
   );
 
-controller.hears(/^開始$/, "direct_mention", async (bot, message) => {
+  controller.hears(/^開始$/, "direct_mention", async (bot, message) => {
     if (state.type === SLEEPING) {
       state.type = STARTED;
       setTimeout(async () => {
@@ -214,66 +214,66 @@ controller.hears(/^開始$/, "direct_mention", async (bot, message) => {
       });
     }
   });
-      
+
   controller.hears(/^ヘルプ$/, "direct_mention", async (bot, message) => {
     if (state.type === STARTED) {
-        await bot.reply(message, {
-          blocks: [
-            {
-              type: "section",
-              text: {
-                type: "mrkdwn",
-                text: ":point_down:Shujinosukeで使えるコマンドは以下の通りです:point_down:\nレポートの投稿\n`レポート` `<@U010MMQGD96> +レポート` `先週から注力してうまくいったこと` `苦戦していること` `来週にかけて注力すること`"
-              },
+      await bot.reply(message, {
+        blocks: [
+          {
+            type: "section",
+            text: {
+              type: "mrkdwn",
+              text:
+                ":point_down:Shujinosukeで使えるコマンドは以下の通りです:point_down:\nレポートの投稿\n`レポート` `<@U010MMQGD96> +レポート` `先週から注力してうまくいったこと` `苦戦していること` `来週にかけて注力すること`",
             },
-            {
-              type: "section",
-              text: {
-                type: "mrkdwn",
-                text: "会議の開始\n`開始`"
-               },
+          },
+          {
+            type: "section",
+            text: {
+              type: "mrkdwn",
+              text: "会議の開始\n`開始`",
             },
-            {
-              type: "section",
-              text: {
-                type: "mrkdwn",
-                text: "会議の強制終了\n`終了` `リセット` `reset`"
-              },
+          },
+          {
+            type: "section",
+            text: {
+              type: "mrkdwn",
+              text: "会議の強制終了\n`終了` `リセット` `reset`",
             },
-            {
-              type: "section",
-              text: {
-                type: "mrkdwn",
-                text: "会議へ参加\n`参加`"
-              },
+          },
+          {
+            type: "section",
+            text: {
+              type: "mrkdwn",
+              text: "会議へ参加\n`参加`",
             },
-            {
-              type: "section",
-              text: {
-                type: "mrkdwn",
-                text: "参加の取り消し\n`キャンセル`"
-              },
+          },
+          {
+            type: "section",
+            text: {
+              type: "mrkdwn",
+              text: "参加の取り消し\n`キャンセル`",
             },
-            {
-              type: "section",
-              text: {
-                type: "mrkdwn",
-                text: "レポート未投稿者の確認\n`誰？`"
-              },
+          },
+          {
+            type: "section",
+            text: {
+              type: "mrkdwn",
+              text: "レポート未投稿者の確認\n`誰？`",
             },
-            {
-              type: "section",
-              text: {
-                type: "mrkdwn",
-                text: "Botステータスの確認\n`status`"
-              },
+          },
+          {
+            type: "section",
+            text: {
+              type: "mrkdwn",
+              text: "Botステータスの確認\n`status`",
             },
-          ],
-        });
-      }
+          },
+        ],
+      });
+    }
   });
 
-  
   controller.on("continue_session", async (bot, message) => {
     if (state.type === STARTED) {
       if (state.members.waiting.length > 0) {
