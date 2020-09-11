@@ -214,65 +214,84 @@ ${JSON.stringify(state, null, 2)}
       });
     }
   });
+  controller.hears(
+    /^(ヘルプ|help)$/,
+    "direct_mention",
+    async (bot, message) => {
+      const help_commands_off = {
+        会議の開始: "`開始`",
+        Botステータスの確認: "`status`",
+        ping: "`ping`",
+        ヘルプ: "`ヘルプ` `help`",
+      };
+      const help_commands_on = {
+        レポートの投稿:
+          "`レポート` `先週から注力してうまくいったこと`\n`苦戦していること` `来週にかけて注力すること`",
+        会議の開始: "`開始`",
+        会議の強制終了: "`終了` `リセット` `reset`",
+        会議へ参加: "`参加`",
+        参加の取り消し: "`キャンセル`",
+        レポート未投稿者の確認: "`誰？`",
+        Botステータスの確認: "`status`",
+        ping: "`ping`",
+        ヘルプ: "`ヘルプ` `help`",
+      };
 
-  controller.hears(/^ヘルプ$/, "direct_mention", async (bot, message) => {
-    if (state.type === STARTED) {
-      await bot.reply(message, {
-        blocks: [
-          {
-            type: "section",
-            text: {
-              type: "mrkdwn",
-              text:
-                ":point_down:Shujinosukeで使えるコマンドは以下の通りです:point_down:\nレポートの投稿\n`レポート` `<@U010MMQGD96> +レポート` `先週から注力してうまくいったこと` `苦戦していること` `来週にかけて注力すること`",
+      let message_array = [];
+      if (state.type === SLEEPING) {
+        for (let key in help_commands_off) {
+          message_array.push(key + "\n" + help_commands_off[key] + "\n\n");
+        }
+        message_txt = message_array.join(",").split(",").join(" ");
+        await bot.reply(message, {
+          blocks: [
+            {
+              type: "section",
+              text: {
+                type: "mrkdwn",
+                text:
+                  ":point_down:会議開始前にShujinosukeで使えるコマンドは以下の通りです:point_down:",
+              },
             },
-          },
-          {
-            type: "section",
-            text: {
-              type: "mrkdwn",
-              text: "会議の開始\n`開始`",
+            {
+              type: "section",
+              text: {
+                type: "mrkdwn",
+                text: message_txt,
+              },
             },
-          },
-          {
-            type: "section",
-            text: {
-              type: "mrkdwn",
-              text: "会議の強制終了\n`終了` `リセット` `reset`",
+          ],
+        });
+      }
+
+      if (state.type === STARTED) {
+        for (let key in help_commands_on) {
+          message_array.push(key + "\n" + help_commands_on[key] + "\n\n");
+        }
+        message_txt = message_array.join(",").split(",").join(" ");
+
+        await bot.reply(message, {
+          blocks: [
+            {
+              type: "section",
+              text: {
+                type: "mrkdwn",
+                text:
+                  ":point_down:会議中にShujinosukeで使えるコマンドは以下の通りです:point_down:",
+              },
             },
-          },
-          {
-            type: "section",
-            text: {
-              type: "mrkdwn",
-              text: "会議へ参加\n`参加`",
+            {
+              type: "section",
+              text: {
+                type: "mrkdwn",
+                text: message_txt,
+              },
             },
-          },
-          {
-            type: "section",
-            text: {
-              type: "mrkdwn",
-              text: "参加の取り消し\n`キャンセル`",
-            },
-          },
-          {
-            type: "section",
-            text: {
-              type: "mrkdwn",
-              text: "レポート未投稿者の確認\n`誰？`",
-            },
-          },
-          {
-            type: "section",
-            text: {
-              type: "mrkdwn",
-              text: "Botステータスの確認\n`status`",
-            },
-          },
-        ],
-      });
+          ],
+        });
+      }
     }
-  });
+  );
 
   controller.on("continue_session", async (bot, message) => {
     if (state.type === STARTED) {
