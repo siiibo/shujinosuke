@@ -13,6 +13,49 @@ let state = {
   },
 };
 
+const help_commands_off = {
+  会議の開始: "`開始`",
+  Botステータスの確認: "`status`",
+  ping: "`ping`",
+  ヘルプ: "`ヘルプ` `help`",
+};
+const help_commands_on = {
+  レポートの投稿:
+    "`レポート` `先週から注力してうまくいったこと`\n`苦戦していること` `来週にかけて注力すること`",
+  会議の開始: "`開始`",
+  会議の強制終了: "`終了` `リセット` `reset`",
+  会議へ参加: "`参加`",
+  参加の取り消し: "`キャンセル`",
+  レポート未投稿者の確認: "`誰？`",
+  Botステータスの確認: "`status`",
+  ping: "`ping`",
+  ヘルプ: "`ヘルプ` `help`",
+};
+
+function gen_message() {
+  let message_txt;
+  if (state.type === SLEEPING) {
+    let help_commnads_off_array = [
+      ':books:会議開始前にShujinosukeで使えるコマンドは以下の通りです！\n:bulb:コマンドの前には必ず "@Shujinosuke" をつけましょう！',
+    ];
+    for (let key in help_commands_off) {
+      help_commnads_off_array.push(
+        "\n\n" + key + "\n" + help_commands_off[key]
+      );
+    }
+    message_txt = help_commnads_off_array.join(",").split(",").join(" ");
+  } else if (state.type === STARTED) {
+    let help_commnads_on_array = [
+      ':books:会議中にShujinosukeで使えるコマンドは以下の通りです！\n:bulb:コマンドの前には必ず "@Shujinosuke" をつけましょう！',
+    ];
+    for (let key in help_commands_on) {
+      help_commnads_on_array.push("\n\n" + key + "\n" + help_commands_on[key]);
+    }
+    message_txt = help_commnads_on_array.join(",").split(",").join(" ");
+  }
+  return message_txt;
+}
+
 async function join(bot, message) {
   if (state.type == STARTED && message.user) {
     if (
@@ -218,78 +261,8 @@ ${JSON.stringify(state, null, 2)}
     /^(ヘルプ|help)$/,
     "direct_mention",
     async (bot, message) => {
-      const help_commands_off = {
-        会議の開始: "`開始`",
-        Botステータスの確認: "`status`",
-        ping: "`ping`",
-        ヘルプ: "`ヘルプ` `help`",
-      };
-      const help_commands_on = {
-        レポートの投稿:
-          "`レポート` `先週から注力してうまくいったこと`\n`苦戦していること` `来週にかけて注力すること`",
-        会議の開始: "`開始`",
-        会議の強制終了: "`終了` `リセット` `reset`",
-        会議へ参加: "`参加`",
-        参加の取り消し: "`キャンセル`",
-        レポート未投稿者の確認: "`誰？`",
-        Botステータスの確認: "`status`",
-        ping: "`ping`",
-        ヘルプ: "`ヘルプ` `help`",
-      };
-
-      let message_array = [];
-      if (state.type === SLEEPING) {
-        for (let key in help_commands_off) {
-          message_array.push(key + "\n" + help_commands_off[key] + "\n\n");
-        }
-        message_txt = message_array.join(",").split(",").join(" ");
-        await bot.reply(message, {
-          blocks: [
-            {
-              type: "section",
-              text: {
-                type: "mrkdwn",
-                text:
-                  ":point_down:会議開始前にShujinosukeで使えるコマンドは以下の通りです:point_down:",
-              },
-            },
-            {
-              type: "section",
-              text: {
-                type: "mrkdwn",
-                text: message_txt,
-              },
-            },
-          ],
-        });
-      }
-
-      if (state.type === STARTED) {
-        for (let key in help_commands_on) {
-          message_array.push(key + "\n" + help_commands_on[key] + "\n\n");
-        }
-        message_txt = message_array.join(",").split(",").join(" ");
-
-        await bot.reply(message, {
-          blocks: [
-            {
-              type: "section",
-              text: {
-                type: "mrkdwn",
-                text:
-                  ":point_down:会議中にShujinosukeで使えるコマンドは以下の通りです:point_down:",
-              },
-            },
-            {
-              type: "section",
-              text: {
-                type: "mrkdwn",
-                text: message_txt,
-              },
-            },
-          ],
-        });
-      }
+      let message_txt = gen_message();
+      await bot.reply(message, message_txt);
     }
   );
 
