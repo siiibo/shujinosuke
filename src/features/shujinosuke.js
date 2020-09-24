@@ -257,6 +257,7 @@ ${JSON.stringify(state, null, 2)}
       });
     }
   });
+
   controller.hears(
     /^(ヘルプ|help)$/,
     "direct_mention",
