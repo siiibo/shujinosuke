@@ -33,27 +33,25 @@ const help_commands_on = {
 };
 
 function gen_message() {
-  let message_txt;
   if (state.type === SLEEPING) {
-    let help_commnads_off_array = [
-      ':books:会議開始前にShujinosukeで使えるコマンドは以下の通りです！\n:bulb:コマンドの前には必ず "@Shujinosuke" をつけましょう！',
-    ];
-    for (let key in help_commands_off) {
-      help_commnads_off_array.push(
-        "\n\n" + key + "\n" + help_commands_off[key]
-      );
-    }
-    message_txt = help_commnads_off_array.join(",").split(",").join(" ");
+    const commands = Object.entries(help_commands_off)
+      .map((x) => "\n" + x[0] + "\n" + x[1])
+      .join("\n");
+
+    return (
+      ':books:会議開始前にShujinosukeで使えるコマンドは以下の通りです！\n:bulb:コマンドの前には必ず "@Shujinosuke" をつけましょう！\n' +
+      commands
+    );
   } else if (state.type === STARTED) {
-    let help_commnads_on_array = [
-      ':books:会議中にShujinosukeで使えるコマンドは以下の通りです！\n:bulb:コマンドの前には必ず "@Shujinosuke" をつけましょう！',
-    ];
-    for (let key in help_commands_on) {
-      help_commnads_on_array.push("\n\n" + key + "\n" + help_commands_on[key]);
-    }
-    message_txt = help_commnads_on_array.join(",").split(",").join(" ");
+    const commands = Object.entries(help_commands_on)
+      .map((x) => "\n" + x[0] + "\n" + x[1])
+      .join("\n");
+
+    return (
+      ':books:会議中にShujinosukeで使えるコマンドは以下の通りです！\n:bulb:コマンドの前には必ず "@Shujinosuke" をつけましょう！\n' +
+      commands
+    );
   }
-  return message_txt;
 }
 
 async function join(bot, message) {
