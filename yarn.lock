@@ -149,7 +149,7 @@
   dependencies:
     "@types/node" "*"
 
-"@types/mongodb@^3.1.19":
+"@types/mongodb@^3.5.25":
   version "3.5.27"
   resolved "https://registry.yarnpkg.com/@types/mongodb/-/mongodb-3.5.27.tgz#158a7a43ce25ef3592ac8a62e62ab38bebf661f2"
   integrity sha512-1jxKDgdfJEOO9zp+lv43p8jOqRs02xPrdUTzAZIVK9tVEySfCEmktL2jEu9A3wOBEOs18yKzpVIKUh8b8ALk3w==
@@ -403,17 +403,17 @@ botbuilder-dialogs@^4.10.1:
     botbuilder-core "4.10.3"
     globalize "^1.4.2"
 
-botbuilder-storage-mongodb@^0.9.5:
-  version "0.9.5"
-  resolved "https://registry.yarnpkg.com/botbuilder-storage-mongodb/-/botbuilder-storage-mongodb-0.9.5.tgz#120a2f78993c650367bf8bbc91a9890f21e08a61"
-  integrity sha512-2BjzwSfQQP45yD5C3nZm4aIYn+7KZTpwQwQRYXt2g0oOYfoA4CLhbjGBbyjguR4Fp129aTJ+UOPA1C062w0lDQ==
+botbuilder-storage-mongodb@^1.0.5:
+  version "1.0.5"
+  resolved "https://registry.yarnpkg.com/botbuilder-storage-mongodb/-/botbuilder-storage-mongodb-1.0.5.tgz#404b3a6d3a49500cc9eb85f450a404f3e45afd8b"
+  integrity sha512-jcQsrYFBIwRq5cQOi3zL59cAfBM2pm5GZqaIOszUp7V2WZcvx2tO/Sai4sUHi4Ponr2gyEk3B1/p1v9MEfKXxg==
   dependencies:
-    "@types/mongodb" "^3.1.19"
-    botbuilder "^4.2.0"
-    mongodb "^3.1.11"
-    request "^2.88.0"
+    "@types/mongodb" "^3.5.25"
+    botbuilder "^4.9.3"
+    mongodb "^3.6.0"
+    request "^2.88.2"
 
-botbuilder@^4.10.1, botbuilder@^4.2.0:
+botbuilder@^4.10.1, botbuilder@^4.9.3:
   version "4.10.3"
   resolved "https://registry.yarnpkg.com/botbuilder/-/botbuilder-4.10.3.tgz#f7391fd260dfb460d2bdd367c757133b2ebc7a11"
   integrity sha512-ylfXxxXdRE2asjk4CXWgWz+c5rRjn6316D/HSGX/0nahqWKhL4/0iatco6dmPpRgYfnAsNUD4nHOdliKhTJxwA==
@@ -751,10 +751,10 @@ dot-prop@^5.2.0:
   dependencies:
     is-obj "^2.0.0"
 
-dotenv@^7.0.0:
-  version "7.0.0"
-  resolved "https://registry.yarnpkg.com/dotenv/-/dotenv-7.0.0.tgz#a2be3cd52736673206e8a85fb5210eea29628e7c"
-  integrity sha512-M3NhsLbV1i6HuGzBUH8vXrtxOk+tWmzWKDMbAVSUp3Zsjm7ywFeuwrUXhmhQyRK1q5B5GGy7hcXPbj3bnfZg2g==
+dotenv@^8.2.0:
+  version "8.2.0"
+  resolved "https://registry.yarnpkg.com/dotenv/-/dotenv-8.2.0.tgz#97e619259ada750eea3e4ea3e26bceea5424b16a"
+  integrity sha512-8sJ78ElpbDJBHNeBzUbUVLsqKdccaa/BXF1uPTw3GrvQTBgrQrtObr2mUrE38vzYd8cEv+m/JBfDLioYcfXoaw==
 
 duplexer3@^0.1.4:
   version "0.1.4"
@@ -1493,7 +1493,7 @@ moment-timezone@^0.5.28:
   resolved "https://registry.yarnpkg.com/moment/-/moment-2.29.0.tgz#fcbef955844d91deb55438613ddcec56e86a3425"
   integrity sha512-z6IJ5HXYiuxvFTI6eiQ9dm77uE0gyy1yXNApVHqTcnIKfY9tIwEjlzsZ6u1LQXvVgKeTnv9Xm7NDvJ7lso3MtA==
 
-mongodb@^3.1.11:
+mongodb@^3.6.0:
   version "3.6.2"
   resolved "https://registry.yarnpkg.com/mongodb/-/mongodb-3.6.2.tgz#1154a4ac107bf1375112d83a29c5cf97704e96b6"
   integrity sha512-sSZOb04w3HcnrrXC82NEh/YGCmBuRgR+C1hZgmmv4L6dBz4BkRse6Y8/q/neXer9i95fKUBbFi4KgeceXmbsOA==
@@ -1771,7 +1771,7 @@ registry-url@^5.0.0:
   dependencies:
     rc "^1.2.8"
 
-request@^2.88.0:
+request@^2.88.0, request@^2.88.2:
   version "2.88.2"
   resolved "https://registry.yarnpkg.com/request/-/request-2.88.2.tgz#d73c918731cb5a87da047e207234146f664d12b3"
   integrity sha512-MsvtOrfG9ZcrOwAW+Qi+F6HbD0CWXEh9ou77uOb7FM2WPhwT7smM833PzanhJLsgXjN89Ir6V2PczXNnMpwKhw==
