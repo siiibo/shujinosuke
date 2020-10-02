@@ -13,6 +13,8 @@ let state = {
   },
 };
 
+let channel_state = new Map();
+
 const help_commands_off = {
   会議の開始: "`開始`",
   Botステータスの確認: "`status`",
@@ -196,7 +198,11 @@ ${JSON.stringify(state, null, 2)}
 
   controller.hears(/^開始$/, "direct_mention", async (bot, message) => {
     if (state.type === SLEEPING) {
-      state.type = STARTED;
+      //state.type = STARTED;
+      channel_state.set(message.channel, {
+        type: STARTED,
+        members: { waiting: [], done: [] },
+      });
       setTimeout(async () => {
         await bot.changeContext(message.reference);
         controller.trigger("continue_session", bot, message);
