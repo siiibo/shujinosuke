@@ -13,6 +13,47 @@ let state = {
   },
 };
 
+const help_commands_off = {
+  会議の開始: "`開始`",
+  Botステータスの確認: "`status`",
+  ping: "`ping`",
+  ヘルプ: "`ヘルプ` `help`",
+};
+const help_commands_on = {
+  レポートの投稿:
+    "`レポート` `先週から注力してうまくいったこと`\n`苦戦していること` `来週にかけて注力すること`",
+  会議の開始: "`開始`",
+  会議の強制終了: "`終了` `リセット` `reset`",
+  会議へ参加: "`参加`",
+  参加の取り消し: "`キャンセル`",
+  レポート未投稿者の確認: "`誰？`",
+  Botステータスの確認: "`status`",
+  ping: "`ping`",
+  ヘルプ: "`ヘルプ` `help`",
+};
+
+function gen_help_message() {
+  if (state.type === SLEEPING) {
+    const commands = Object.entries(help_commands_off)
+      .map(([key, val]) => key + "\n" + val)
+      .join("\n\n");
+
+    return (
+      ':books:会議開始前にShujinosukeで使えるコマンドは以下の通りです！\n:bulb:コマンドの前には必ず "@Shujinosuke" をつけましょう！\n\n' +
+      commands
+    );
+  } else if (state.type === STARTED) {
+    const commands = Object.entries(help_commands_on)
+      .map((x) => "\n" + x[0] + "\n" + x[1])
+      .join("\n");
+
+    return (
+      ':books:会議中にShujinosukeで使えるコマンドは以下の通りです！\n:bulb:コマンドの前には必ず "@Shujinosuke" をつけましょう！\n\n' +
+      commands
+    );
+  }
+}
+
 async function join(bot, message) {
   if (state.type == STARTED && message.user) {
     if (
@@ -94,7 +135,7 @@ module.exports = function (controller) {
     }
   });
 
-  controller.hears(/誰？?$/, "direct_mention", async (bot, message) => {
+  controller.hears(/誰？$/, "direct_mention", async (bot, message) => {
     if (state.type === STARTED) {
       if (state.members.waiting.length > 0) {
         const remaining = state.members.waiting
@@ -214,6 +255,15 @@ ${JSON.stringify(state, null, 2)}
       });
     }
   });
+
+  controller.hears(
+    /^(ヘルプ|help)$/,
+    "direct_mention",
+    async (bot, message) => {
+      let message_txt = gen_help_message();
+      await bot.reply(message, message_txt);
+    }
+  );
 
   controller.on("continue_session", async (bot, message) => {
     if (state.type === STARTED) {
