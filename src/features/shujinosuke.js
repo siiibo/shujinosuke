@@ -32,7 +32,7 @@ const help_commands_on = {
   ヘルプ: "`ヘルプ` `help`",
 };
 
-function gen_message() {
+function gen_help_message() {
   if (state.type === SLEEPING) {
     const commands = Object.entries(help_commands_off)
       .map((x) => "\n" + x[0] + "\n" + x[1])
@@ -260,7 +260,7 @@ ${JSON.stringify(state, null, 2)}
     /^(ヘルプ|help)$/,
     "direct_mention",
     async (bot, message) => {
-      let message_txt = gen_message();
+      let message_txt = gen_help_message();
       await bot.reply(message, message_txt);
     }
   );
