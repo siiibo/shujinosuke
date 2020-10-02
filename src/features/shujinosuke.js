@@ -35,11 +35,11 @@ const help_commands_on = {
 function gen_help_message() {
   if (state.type === SLEEPING) {
     const commands = Object.entries(help_commands_off)
-      .map((x) => "\n" + x[0] + "\n" + x[1])
-      .join("\n");
+      .map(([key, val]) => key + "\n" + val)
+      .join("\n\n");
 
     return (
-      ':books:会議開始前にShujinosukeで使えるコマンドは以下の通りです！\n:bulb:コマンドの前には必ず "@Shujinosuke" をつけましょう！\n' +
+      ':books:会議開始前にShujinosukeで使えるコマンドは以下の通りです！\n:bulb:コマンドの前には必ず "@Shujinosuke" をつけましょう！\n\n' +
       commands
     );
   } else if (state.type === STARTED) {
@@ -48,7 +48,7 @@ function gen_help_message() {
       .join("\n");
 
     return (
-      ':books:会議中にShujinosukeで使えるコマンドは以下の通りです！\n:bulb:コマンドの前には必ず "@Shujinosuke" をつけましょう！\n' +
+      ':books:会議中にShujinosukeで使えるコマンドは以下の通りです！\n:bulb:コマンドの前には必ず "@Shujinosuke" をつけましょう！\n\n' +
       commands
     );
   }
