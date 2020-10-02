@@ -15,6 +15,12 @@ let state = {
 
 let channel_state = new Map();
 
+function remove_state_element(message) {
+  if (channel_state.has(message.channel)) {
+    channel_state.delete(message.channel);
+  }
+}
+
 const help_commands_off = {
   会議の開始: "`開始`",
   Botステータスの確認: "`status`",
@@ -163,6 +169,7 @@ module.exports = function (controller) {
         type: SLEEPING,
         members: { waiting: [], done: [] },
       };
+      remove_state_element(message);
       await bot.say(`
 リセットします。直前の状態は以下のようになっていました:
 \`\`\`
@@ -198,7 +205,7 @@ ${JSON.stringify(state, null, 2)}
 
   controller.hears(/^開始$/, "direct_mention", async (bot, message) => {
     if (state.type === SLEEPING) {
-      //state.type = STARTED;
+      state.type = STARTED;
       channel_state.set(message.channel, {
         type: STARTED,
         members: { waiting: [], done: [] },
@@ -295,6 +302,7 @@ ${JSON.stringify(state, null, 2)}
     if (state.type === STARTED) {
       state.type = SLEEPING;
       state.members = { waiting: [], done: [] };
+      remove_state_element(message);
       await bot.say(`
 :stopwatch: 時間になりました！ みなさんご協力ありがとうございました。 :bow:
 :rainbow: リフレッシュして、業務に戻りましょう！ :notes:
