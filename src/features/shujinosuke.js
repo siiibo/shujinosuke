@@ -164,7 +164,7 @@ module.exports = function (controller) {
     /^(終了|リセット|reset)$/,
     "direct_mention",
     async (bot, message) => {
-      const state_dump = JSON.stringify(state, null, 2);
+      const state_dump = JSON.stringify(Array.from(channel_state), null, 2);
       state = {
         type: SLEEPING,
         members: { waiting: [], done: [] },
@@ -182,7 +182,7 @@ ${state_dump}
   controller.hears(/^status$/, "direct_mention", async (bot, message) => {
     await bot.say(`
 \`\`\`
-${JSON.stringify(state, null, 2)}
+${JSON.stringify(Array.from(channel_state), null, 2)}
 \`\`\`
 `);
   });
@@ -196,7 +196,7 @@ ${JSON.stringify(state, null, 2)}
         `
 pong!
 \`\`\`
-${JSON.stringify(state, null, 2)}
+${JSON.stringify(Array.from(channel_state), null, 2)}
 \`\`\`
 `
       );
