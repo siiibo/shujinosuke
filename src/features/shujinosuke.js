@@ -41,7 +41,7 @@ const help_commands_on = {
 };
 
 function gen_help_message() {
-  if (state.type === SLEEPING) {
+  if (!channel_state.has(message.channel)) {
     const commands = Object.entries(help_commands_off)
       .map(([key, val]) => key + "\n" + val)
       .join("\n\n");
@@ -50,7 +50,7 @@ function gen_help_message() {
       ':books:会議開始前にShujinosukeで使えるコマンドは以下の通りです！\n:bulb:コマンドの前には必ず "@Shujinosuke" をつけましょう！\n\n' +
       commands
     );
-  } else if (state.type === STARTED) {
+  } else if (channel_state.has(message.channel)) {
     const commands = Object.entries(help_commands_on)
       .map((x) => "\n" + x[0] + "\n" + x[1])
       .join("\n");
@@ -63,7 +63,7 @@ function gen_help_message() {
 }
 
 async function join(bot, message) {
-  if (state.type == STARTED && message.user) {
+  if (channel_state.has(message.channel) && message.user) {
     if (
       state.members.waiting.includes(message.user) ||
       state.members.done.includes(message.user)
@@ -77,7 +77,10 @@ async function join(bot, message) {
 }
 
 async function check_all_reported(controller, bot, message) {
-  if (state.type === STARTED && state.members.waiting.length === 0) {
+  if (
+    channel_state.has(message.channel) &&
+    state.members.waiting.length === 0
+  ) {
     await bot.changeContext(message.reference);
     setTimeout(async () => {
       await bot.changeContext(message.reference);
@@ -108,7 +111,7 @@ module.exports = function (controller) {
     ],
     "direct_mention,mention,message",
     async (bot, message) => {
-      if (state.type === STARTED) {
+      if (channel_state.has(message.channel)) {
         state.members.done.push(message.user);
         state.members.waiting = state.members.waiting.filter(
           (value, _index, _array) => value !== message.user
@@ -131,7 +134,7 @@ module.exports = function (controller) {
   });
 
   controller.hears(/^キャンセル$/, "direct_mention", async (bot, message) => {
-    if (state.type === STARTED) {
+    if (channel_state.has(message.channel)) {
       state.members.waiting = state.members.waiting.filter(
         (value, _index, _array) => value !== message.user
       );
@@ -144,7 +147,7 @@ module.exports = function (controller) {
   });
 
   controller.hears(/誰？$/, "direct_mention", async (bot, message) => {
-    if (state.type === STARTED) {
+    if (channel_state.has(message.channel)) {
       if (state.members.waiting.length > 0) {
         const remaining = state.members.waiting
           .map((value, _index, _array) => `<@${value}>`)
@@ -204,7 +207,7 @@ ${JSON.stringify(Array.from(channel_state), null, 2)}
   );
 
   controller.hears(/^開始$/, "direct_mention", async (bot, message) => {
-    if (state.type === SLEEPING) {
+    if (!channel_state.has(message.channel)) {
       state.type = STARTED;
       channel_state.set(message.channel, { waiting: [], done: [] });
       setTimeout(async () => {
@@ -276,7 +279,7 @@ ${JSON.stringify(Array.from(channel_state), null, 2)}
   );
 
   controller.on("continue_session", async (bot, message) => {
-    if (state.type === STARTED) {
+    if (channel_state.has(message.channel)) {
       if (state.members.waiting.length > 0) {
         const remaining_count = state.members.waiting.length;
         await bot.say(`
@@ -296,7 +299,7 @@ ${JSON.stringify(Array.from(channel_state), null, 2)}
   });
 
   controller.on("end_session", async (bot, message) => {
-    if (state.type === STARTED) {
+    if (channel_state.has(message.channel)) {
       state.type = SLEEPING;
       state.members = { waiting: [], done: [] };
       remove_state_element(message);
