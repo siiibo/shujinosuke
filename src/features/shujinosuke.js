@@ -5,13 +5,6 @@ const SLEEPING = "sleeping";
 const STARTED = "started";
 const CHECK_TIMEOUT_SECONDS = 1200;
 const ENDING_PERIOD_SECONDS = 300;
-let state = {
-  type: SLEEPING,
-  members: {
-    waiting: [],
-    done: [],
-  },
-};
 
 let channel_state = new Map();
 
@@ -169,10 +162,6 @@ module.exports = function (controller) {
     "direct_mention",
     async (bot, message) => {
       const state_dump = JSON.stringify(Array.from(channel_state), null, 2);
-      state = {
-        type: SLEEPING,
-        members: { waiting: [], done: [] },
-      };
       remove_state_element(message);
       await bot.say(`
 リセットします。直前の状態は以下のようになっていました:
@@ -209,7 +198,6 @@ ${JSON.stringify(Array.from(channel_state), null, 2)}
 
   controller.hears(/^開始$/, "direct_mention", async (bot, message) => {
     if (!channel_state.has(message.channel)) {
-      state.type = STARTED;
       channel_state.set(message.channel, { waiting: [], done: [] });
       setTimeout(async () => {
         await bot.changeContext(message.reference);
@@ -292,7 +280,6 @@ ${JSON.stringify(Array.from(channel_state), null, 2)}
         // Do nothing; end_session timer should be working
       } else {
         // No participants
-        state.type = SLEEPING;
         await bot.say(`
 :fast_forward: 終了します。
 `);
@@ -302,8 +289,6 @@ ${JSON.stringify(Array.from(channel_state), null, 2)}
 
   controller.on("end_session", async (bot, message) => {
     if (channel_state.has(message.channel)) {
-      state.type = SLEEPING;
-      channel_state.get(message.channel) = { waiting: [], done: [] };
       remove_state_element(message);
       await bot.say(`
 :stopwatch: 時間になりました！ みなさんご協力ありがとうございました。 :bow:
