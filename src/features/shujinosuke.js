@@ -206,10 +206,7 @@ ${JSON.stringify(Array.from(channel_state), null, 2)}
   controller.hears(/^開始$/, "direct_mention", async (bot, message) => {
     if (state.type === SLEEPING) {
       state.type = STARTED;
-      channel_state.set(message.channel, {
-        type: STARTED,
-        members: { waiting: [], done: [] },
-      });
+      channel_state.set(message.channel, { waiting: [], done: [] });
       setTimeout(async () => {
         await bot.changeContext(message.reference);
         controller.trigger("continue_session", bot, message);
