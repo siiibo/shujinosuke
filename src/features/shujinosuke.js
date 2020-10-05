@@ -33,7 +33,7 @@ const help_commands_on = {
   ヘルプ: "`ヘルプ` `help`",
 };
 
-function gen_help_message() {
+function gen_help_message(message) {
   if (!channel_state.has(message.channel)) {
     const commands = Object.entries(help_commands_off)
       .map(([key, val]) => key + "\n" + val)
@@ -262,7 +262,7 @@ ${JSON.stringify(Array.from(channel_state), null, 2)}
     /^(ヘルプ|help)$/,
     "direct_mention",
     async (bot, message) => {
-      let message_txt = gen_help_message();
+      let message_txt = gen_help_message(message);
       await bot.reply(message, message_txt);
     }
   );
