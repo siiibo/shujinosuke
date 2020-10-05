@@ -65,12 +65,12 @@ function gen_help_message() {
 async function join(bot, message) {
   if (channel_state.has(message.channel) && message.user) {
     if (
-      state.members.waiting.includes(message.user) ||
-      state.members.done.includes(message.user)
+      channel_state.get(message.channel).waiting.includes(message.user) ||
+      channel_state.get(message.channel).done.includes(message.user)
     ) {
       await bot.replyEphemeral(message, "(大丈夫、参加済みですよ :+1:)");
     } else {
-      state.members.waiting.push(message.user);
+      channel_state.get(message.channel).waiting.push(message.user);
       await bot.reply(message, `:hand: <@${message.user}> が参加しました`);
     }
   }
@@ -79,7 +79,7 @@ async function join(bot, message) {
 async function check_all_reported(controller, bot, message) {
   if (
     channel_state.has(message.channel) &&
-    state.members.waiting.length === 0
+    channel_state.get(message.channel).waiting.length === 0
   ) {
     await bot.changeContext(message.reference);
     setTimeout(async () => {
@@ -112,10 +112,10 @@ module.exports = function (controller) {
     "direct_mention,mention,message",
     async (bot, message) => {
       if (channel_state.has(message.channel)) {
-        state.members.done.push(message.user);
-        state.members.waiting = state.members.waiting.filter(
-          (value, _index, _array) => value !== message.user
-        );
+        channel_state.get(message.channel).done.push(message.user);
+        channel_state.get(message.channel).waiting = channel_state
+          .get(message.channel)
+          .waiting.filter((value, _index, _array) => value !== message.user);
         await bot.replyInThread(
           message,
           `
@@ -135,9 +135,9 @@ module.exports = function (controller) {
 
   controller.hears(/^キャンセル$/, "direct_mention", async (bot, message) => {
     if (channel_state.has(message.channel)) {
-      state.members.waiting = state.members.waiting.filter(
-        (value, _index, _array) => value !== message.user
-      );
+      channel_state.get(message.channel).waiting = channel_state
+        .get(message.channel)
+        .waiting.filter((value, _index, _array) => value !== message.user);
       await bot.reply(
         message,
         `:wave: <@${message.user}> がキャンセルしました`
@@ -148,9 +148,10 @@ module.exports = function (controller) {
 
   controller.hears(/誰？$/, "direct_mention", async (bot, message) => {
     if (channel_state.has(message.channel)) {
-      if (state.members.waiting.length > 0) {
-        const remaining = state.members.waiting
-          .map((value, _index, _array) => `<@${value}>`)
+      if (channel_state.get(message.channel).waiting.length > 0) {
+        const remaining = channel_state
+          .get(message.channel)
+          .waiting.map((value, _index, _array) => `<@${value}>`)
           .join(", ");
         await bot.say(`
 :point_right: 残りは${remaining}です。
@@ -280,13 +281,14 @@ ${JSON.stringify(Array.from(channel_state), null, 2)}
 
   controller.on("continue_session", async (bot, message) => {
     if (channel_state.has(message.channel)) {
-      if (state.members.waiting.length > 0) {
-        const remaining_count = state.members.waiting.length;
+      if (channel_state.get(message.channel).waiting.length > 0) {
+        const remaining_count = channel_state.get(message.channel).waiting
+          .length;
         await bot.say(`
 :stopwatch: あと${remaining_count}人です。全体連絡を先に始めていてもOKです。
 :question: 私がちゃんと反応しなかった場合、削除して投稿し直してみてください。
 `);
-      } else if (state.members.done.length > 0) {
+      } else if (channel_state.get(message.channel).done.length > 0) {
         // Do nothing; end_session timer should be working
       } else {
         // No participants
@@ -301,7 +303,7 @@ ${JSON.stringify(Array.from(channel_state), null, 2)}
   controller.on("end_session", async (bot, message) => {
     if (channel_state.has(message.channel)) {
       state.type = SLEEPING;
-      state.members = { waiting: [], done: [] };
+      channel_state.get(message.channel) = { waiting: [], done: [] };
       remove_state_element(message);
       await bot.say(`
 :stopwatch: 時間になりました！ みなさんご協力ありがとうございました。 :bow:
