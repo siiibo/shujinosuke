@@ -6,7 +6,7 @@ const STARTED = "started";
 const CHECK_TIMEOUT_SECONDS = 1200;
 const ENDING_PERIOD_SECONDS = 300;
 
-let channel_state = new Map();
+let global_state = new Map();
 
 const help_commands_off = {
   会議の開始: "`開始`",
@@ -28,7 +28,7 @@ const help_commands_on = {
 };
 
 function gen_help_message(message) {
-  if (!channel_state.has(message.channel)) {
+  if (!global_state.has(message.channel)) {
     const commands = Object.entries(help_commands_off)
       .map(([key, val]) => key + "\n" + val)
       .join("\n\n");
@@ -37,7 +37,7 @@ function gen_help_message(message) {
       ':books:会議開始前にShujinosukeで使えるコマンドは以下の通りです！\n:bulb:コマンドの前には必ず "@Shujinosuke" をつけましょう！\n\n' +
       commands
     );
-  } else if (channel_state.has(message.channel)) {
+  } else if (global_state.has(message.channel)) {
     const commands = Object.entries(help_commands_on)
       .map((x) => "\n" + x[0] + "\n" + x[1])
       .join("\n");
@@ -50,14 +50,14 @@ function gen_help_message(message) {
 }
 
 async function join(bot, message) {
-  if (channel_state.has(message.channel) && message.user) {
+  if (global_state.has(message.channel) && message.user) {
     if (
-      channel_state.get(message.channel).waiting.includes(message.user) ||
-      channel_state.get(message.channel).done.includes(message.user)
+      global_state.get(message.channel).waiting.includes(message.user) ||
+      global_state.get(message.channel).done.includes(message.user)
     ) {
       await bot.replyEphemeral(message, "(大丈夫、参加済みですよ :+1:)");
     } else {
-      channel_state.get(message.channel).waiting.push(message.user);
+      global_state.get(message.channel).waiting.push(message.user);
       await bot.reply(message, `:hand: <@${message.user}> が参加しました`);
     }
   }
@@ -65,8 +65,8 @@ async function join(bot, message) {
 
 async function check_all_reported(controller, bot, message) {
   if (
-    channel_state.has(message.channel) &&
-    channel_state.get(message.channel).waiting.length === 0
+    global_state.has(message.channel) &&
+    global_state.get(message.channel).waiting.length === 0
   ) {
     await bot.changeContext(message.reference);
     setTimeout(async () => {
@@ -98,9 +98,9 @@ module.exports = function (controller) {
     ],
     "direct_mention,mention,message",
     async (bot, message) => {
-      if (channel_state.has(message.channel)) {
-        channel_state.get(message.channel).done.push(message.user);
-        channel_state.get(message.channel).waiting = channel_state
+      if (global_state.has(message.channel)) {
+        global_state.get(message.channel).done.push(message.user);
+        global_state.get(message.channel).waiting = global_state
           .get(message.channel)
           .waiting.filter((value, _index, _array) => value !== message.user);
         await bot.replyInThread(
@@ -121,8 +121,8 @@ module.exports = function (controller) {
   });
 
   controller.hears(/^キャンセル$/, "direct_mention", async (bot, message) => {
-    if (channel_state.has(message.channel)) {
-      channel_state.get(message.channel).waiting = channel_state
+    if (global_state.has(message.channel)) {
+      global_state.get(message.channel).waiting = global_state
         .get(message.channel)
         .waiting.filter((value, _index, _array) => value !== message.user);
       await bot.reply(
@@ -134,9 +134,9 @@ module.exports = function (controller) {
   });
 
   controller.hears(/誰？$/, "direct_mention", async (bot, message) => {
-    if (channel_state.has(message.channel)) {
-      if (channel_state.get(message.channel).waiting.length > 0) {
-        const remaining = channel_state
+    if (global_state.has(message.channel)) {
+      if (global_state.get(message.channel).waiting.length > 0) {
+        const remaining = global_state
           .get(message.channel)
           .waiting.map((value, _index, _array) => `<@${value}>`)
           .join(", ");
@@ -155,8 +155,8 @@ module.exports = function (controller) {
     /^(終了|リセット|reset)$/,
     "direct_mention",
     async (bot, message) => {
-      const state_dump = JSON.stringify(Array.from(channel_state), null, 2);
-      channel_state.delete(message.channel);
+      const state_dump = JSON.stringify(Array.from(global_state), null, 2);
+      global_state.delete(message.channel);
       await bot.say(`
 リセットします。直前の状態は以下のようになっていました:
 \`\`\`
@@ -169,7 +169,7 @@ ${state_dump}
   controller.hears(/^status$/, "direct_mention", async (bot, message) => {
     await bot.say(`
 \`\`\`
-${JSON.stringify(Array.from(channel_state), null, 2)}
+${JSON.stringify(Array.from(global_state), null, 2)}
 \`\`\`
 `);
   });
@@ -183,7 +183,7 @@ ${JSON.stringify(Array.from(channel_state), null, 2)}
         `
 pong!
 \`\`\`
-${JSON.stringify(Array.from(channel_state), null, 2)}
+${JSON.stringify(Array.from(global_state), null, 2)}
 \`\`\`
 `
       );
@@ -191,8 +191,8 @@ ${JSON.stringify(Array.from(channel_state), null, 2)}
   );
 
   controller.hears(/^開始$/, "direct_mention", async (bot, message) => {
-    if (!channel_state.has(message.channel)) {
-      channel_state.set(message.channel, { waiting: [], done: [] });
+    if (!global_state.has(message.channel)) {
+      global_state.set(message.channel, { waiting: [], done: [] });
       setTimeout(async () => {
         await bot.changeContext(message.reference);
         controller.trigger("continue_session", bot, message);
@@ -262,15 +262,15 @@ ${JSON.stringify(Array.from(channel_state), null, 2)}
   );
 
   controller.on("continue_session", async (bot, message) => {
-    if (channel_state.has(message.channel)) {
-      if (channel_state.get(message.channel).waiting.length > 0) {
-        const remaining_count = channel_state.get(message.channel).waiting
+    if (global_state.has(message.channel)) {
+      if (global_state.get(message.channel).waiting.length > 0) {
+        const remaining_count = global_state.get(message.channel).waiting
           .length;
         await bot.say(`
 :stopwatch: あと${remaining_count}人です。全体連絡を先に始めていてもOKです。
 :question: 私がちゃんと反応しなかった場合、削除して投稿し直してみてください。
 `);
-      } else if (channel_state.get(message.channel).done.length > 0) {
+      } else if (global_state.get(message.channel).done.length > 0) {
         // Do nothing; end_session timer should be working
       } else {
         // No participants
@@ -282,7 +282,7 @@ ${JSON.stringify(Array.from(channel_state), null, 2)}
   });
 
   controller.on("end_session", async (bot, message) => {
-    if (channel_state.delete(message.channel)) {
+    if (global_state.delete(message.channel)) {
       await bot.say(`
 :stopwatch: 時間になりました！ みなさんご協力ありがとうございました。 :bow:
 :rainbow: リフレッシュして、業務に戻りましょう！ :notes:
