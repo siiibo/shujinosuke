@@ -8,12 +8,6 @@ const ENDING_PERIOD_SECONDS = 300;
 
 let channel_state = new Map();
 
-function remove_state_element(message) {
-  if (channel_state.has(message.channel)) {
-    channel_state.delete(message.channel);
-  }
-}
-
 const help_commands_off = {
   会議の開始: "`開始`",
   Botステータスの確認: "`status`",
@@ -162,7 +156,7 @@ module.exports = function (controller) {
     "direct_mention",
     async (bot, message) => {
       const state_dump = JSON.stringify(Array.from(channel_state), null, 2);
-      remove_state_element(message);
+      channel_state.delete(message.channel);
       await bot.say(`
 リセットします。直前の状態は以下のようになっていました:
 \`\`\`
@@ -288,8 +282,7 @@ ${JSON.stringify(Array.from(channel_state), null, 2)}
   });
 
   controller.on("end_session", async (bot, message) => {
-    if (channel_state.has(message.channel)) {
-      remove_state_element(message);
+    if (channel_state.delete(message.channel)) {
       await bot.say(`
 :stopwatch: 時間になりました！ みなさんご協力ありがとうございました。 :bow:
 :rainbow: リフレッシュして、業務に戻りましょう！ :notes:
