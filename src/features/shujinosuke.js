@@ -50,24 +50,23 @@ function gen_help_message(message) {
 }
 
 async function join(bot, message) {
-  if (global_state.has(message.channel) && message.user) {
+  let channel_state = global_state.get(message.channel);
+  if (channel_state && message.user) {
     if (
-      global_state.get(message.channel).waiting.includes(message.user) ||
-      global_state.get(message.channel).done.includes(message.user)
+      channel_state.waiting.includes(message.user) ||
+      channel_state.done.includes(message.user)
     ) {
       await bot.replyEphemeral(message, "(大丈夫、参加済みですよ :+1:)");
     } else {
-      global_state.get(message.channel).waiting.push(message.user);
+      channel_state.waiting.push(message.user);
       await bot.reply(message, `:hand: <@${message.user}> が参加しました`);
     }
   }
 }
 
 async function check_all_reported(controller, bot, message) {
-  if (
-    global_state.has(message.channel) &&
-    global_state.get(message.channel).waiting.length === 0
-  ) {
+  let channel_state = global_state.get(message.channel);
+  if (channel_state && channel_state.waiting.length === 0) {
     await bot.changeContext(message.reference);
     setTimeout(async () => {
       await bot.changeContext(message.reference);
@@ -98,11 +97,12 @@ module.exports = function (controller) {
     ],
     "direct_mention,mention,message",
     async (bot, message) => {
-      if (global_state.has(message.channel)) {
-        global_state.get(message.channel).done.push(message.user);
-        global_state.get(message.channel).waiting = global_state
-          .get(message.channel)
-          .waiting.filter((value, _index, _array) => value !== message.user);
+      let channel_state = global_state.get(message.channel);
+      if (channel_state) {
+        channel_state.done.push(message.user);
+        channel_state.waiting = channel_state.waiting.filter(
+          (value, _index, _array) => value !== message.user
+        );
         await bot.replyInThread(
           message,
           `
@@ -121,10 +121,11 @@ module.exports = function (controller) {
   });
 
   controller.hears(/^キャンセル$/, "direct_mention", async (bot, message) => {
-    if (global_state.has(message.channel)) {
-      global_state.get(message.channel).waiting = global_state
-        .get(message.channel)
-        .waiting.filter((value, _index, _array) => value !== message.user);
+    let channel_state = global_state.get(message.channel);
+    if (channel_state) {
+      channel_state.waiting = channel_state.waiting.filter(
+        (value, _index, _array) => value !== message.user
+      );
       await bot.reply(
         message,
         `:wave: <@${message.user}> がキャンセルしました`
@@ -134,11 +135,11 @@ module.exports = function (controller) {
   });
 
   controller.hears(/誰？$/, "direct_mention", async (bot, message) => {
-    if (global_state.has(message.channel)) {
-      if (global_state.get(message.channel).waiting.length > 0) {
-        const remaining = global_state
-          .get(message.channel)
-          .waiting.map((value, _index, _array) => `<@${value}>`)
+    let channel_state = global_state.get(message.channel);
+    if (channel_state) {
+      if (channel_state.waiting.length > 0) {
+        const remaining = channel_state.waiting
+          .map((value, _index, _array) => `<@${value}>`)
           .join(", ");
         await bot.say(`
 :point_right: 残りは${remaining}です。
@@ -262,15 +263,15 @@ ${JSON.stringify(Array.from(global_state), null, 2)}
   );
 
   controller.on("continue_session", async (bot, message) => {
-    if (global_state.has(message.channel)) {
-      if (global_state.get(message.channel).waiting.length > 0) {
-        const remaining_count = global_state.get(message.channel).waiting
-          .length;
+    let channel_state = global_state.get(message.channel);
+    if (channel_state) {
+      if (channel_state.waiting.length > 0) {
+        const remaining_count = channel_state.waiting.length;
         await bot.say(`
 :stopwatch: あと${remaining_count}人です。全体連絡を先に始めていてもOKです。
 :question: 私がちゃんと反応しなかった場合、削除して投稿し直してみてください。
 `);
-      } else if (global_state.get(message.channel).done.length > 0) {
+      } else if (channel_state.done.length > 0) {
         // Do nothing; end_session timer should be working
       } else {
         // No participants
