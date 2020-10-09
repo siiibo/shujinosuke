@@ -39,8 +39,8 @@ function gen_help_message(message) {
     );
   } else if (global_state.has(message.channel)) {
     const commands = Object.entries(help_commands_on)
-      .map((x) => "\n" + x[0] + "\n" + x[1])
-      .join("\n");
+      .map(([key, val]) => key + "\n" + val)
+      .join("\n\n");
 
     return (
       ':books:会議中にShujinosukeで使えるコマンドは以下の通りです！\n:bulb:コマンドの前には必ず "@Shujinosuke" をつけましょう！\n\n' +
@@ -156,7 +156,11 @@ module.exports = function (controller) {
     /^(終了|リセット|reset)$/,
     "direct_mention",
     async (bot, message) => {
-      const state_dump = JSON.stringify(Array.from(global_state), null, 2);
+      const state_dump = JSON.stringify(
+        Object.fromEntries(global_state),
+        null,
+        2
+      );
       global_state.delete(message.channel);
       await bot.say(`
 リセットします。直前の状態は以下のようになっていました:
@@ -170,7 +174,7 @@ ${state_dump}
   controller.hears(/^status$/, "direct_mention", async (bot, message) => {
     await bot.say(`
 \`\`\`
-${JSON.stringify(Array.from(global_state), null, 2)}
+${JSON.stringify(Object.fromEntries(global_state), null, 2)}
 \`\`\`
 `);
   });
@@ -184,7 +188,7 @@ ${JSON.stringify(Array.from(global_state), null, 2)}
         `
 pong!
 \`\`\`
-${JSON.stringify(Array.from(global_state), null, 2)}
+${JSON.stringify(Object.fromEntries(global_state), null, 2)}
 \`\`\`
 `
       );
@@ -258,7 +262,7 @@ ${JSON.stringify(Array.from(global_state), null, 2)}
     "direct_mention",
     async (bot, message) => {
       let message_txt = gen_help_message(message);
-      await bot.reply(message, message_txt);
+      await bot.replyEphemeral(message, message_txt);
     }
   );
 
