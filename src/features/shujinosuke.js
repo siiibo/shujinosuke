@@ -39,8 +39,8 @@ function gen_help_message(message) {
     );
   } else if (global_state.has(message.channel)) {
     const commands = Object.entries(help_commands_on)
-      .map((x) => "\n" + x[0] + "\n" + x[1])
-      .join("\n");
+      .map(([key, val]) => key + "\n" + val)
+      .join("\n\n");
 
     return (
       ':books:会議中にShujinosukeで使えるコマンドは以下の通りです！\n:bulb:コマンドの前には必ず "@Shujinosuke" をつけましょう！\n\n' +
