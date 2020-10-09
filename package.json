@@ -5,7 +5,7 @@
   "main": "bot.js",
   "private": true,
   "engines": {
-    "node": "10",
+    "node": "12",
     "yarn": "1.22"
   },
   "scripts": {
