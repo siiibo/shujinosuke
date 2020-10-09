@@ -156,7 +156,11 @@ module.exports = function (controller) {
     /^(終了|リセット|reset)$/,
     "direct_mention",
     async (bot, message) => {
-      const state_dump = JSON.stringify(Array.from(global_state), null, 2);
+      const state_dump = JSON.stringify(
+        Object.fromEntries(global_state),
+        null,
+        2
+      );
       global_state.delete(message.channel);
       await bot.say(`
 リセットします。直前の状態は以下のようになっていました:
@@ -170,7 +174,7 @@ ${state_dump}
   controller.hears(/^status$/, "direct_mention", async (bot, message) => {
     await bot.say(`
 \`\`\`
-${JSON.stringify(Array.from(global_state), null, 2)}
+${JSON.stringify(Object.fromEntries(global_state), null, 2)}
 \`\`\`
 `);
   });
@@ -184,7 +188,7 @@ ${JSON.stringify(Array.from(global_state), null, 2)}
         `
 pong!
 \`\`\`
-${JSON.stringify(Array.from(global_state), null, 2)}
+${JSON.stringify(Object.fromEntries(global_state), null, 2)}
 \`\`\`
 `
       );
