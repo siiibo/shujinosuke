@@ -262,7 +262,7 @@ ${JSON.stringify(Object.fromEntries(global_state), null, 2)}
     "direct_mention",
     async (bot, message) => {
       let message_txt = gen_help_message(message);
-      await bot.reply(message, message_txt);
+      await bot.replyEphemeral(message, message_txt);
     }
   );
 
