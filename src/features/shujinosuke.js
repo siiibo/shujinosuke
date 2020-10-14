@@ -202,7 +202,7 @@ ${JSON.stringify(Object.fromEntries(global_state), null, 2)}
       setTimeout(async () => {
         await bot.changeContext(message.reference);
         controller.trigger("check_participants", bot, message);
-      }, CALL_REMINDER_SECONDS * 1000);
+      }, CALL_REMINDER_SECONDS * 50);
       setTimeout(async () => {
         await bot.changeContext(message.reference);
         controller.trigger("continue_session", bot, message);
@@ -277,14 +277,14 @@ ${JSON.stringify(Object.fromEntries(global_state), null, 2)}
       channel: message.channel,
     });
     channel_members = channel_members.members;
-    channel_members = channel_members.filter(
+    let members_not_in_meeting = channel_members.filter(
       (member) =>
         !channel_state.waiting.includes(member) &&
         !channel_state.done.includes(member) &&
         member !== "U010MMQGD96" //Removing the ID of Shujinosuke from channel_members
     );
-    if (channel_members.length > 0) {
-      await channel_members.map((member) =>
+    if (members_not_in_meeting.length > 0) {
+      await members_not_in_meeting.map((member) =>
         bot.api.chat.postEphemeral({
           channel: message.channel,
           user: member,
