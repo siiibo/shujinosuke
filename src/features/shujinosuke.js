@@ -202,7 +202,7 @@ ${JSON.stringify(Object.fromEntries(global_state), null, 2)}
       setTimeout(async () => {
         await bot.changeContext(message.reference);
         controller.trigger("check_participants", bot, message);
-      }, CALL_REMINDER_SECONDS * 50);
+      }, CALL_REMINDER_SECONDS * 1000);
       setTimeout(async () => {
         await bot.changeContext(message.reference);
         controller.trigger("continue_session", bot, message);
