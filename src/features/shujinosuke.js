@@ -5,6 +5,7 @@ const SLEEPING = "sleeping";
 const STARTED = "started";
 const CHECK_TIMEOUT_SECONDS = 1200;
 const ENDING_PERIOD_SECONDS = 300;
+const CALL_REMINDER_SECONDS = 180;
 
 let global_state = new Map();
 
@@ -200,6 +201,10 @@ ${JSON.stringify(Object.fromEntries(global_state), null, 2)}
       global_state.set(message.channel, { waiting: [], done: [] });
       setTimeout(async () => {
         await bot.changeContext(message.reference);
+        controller.trigger("check_participants", bot, message);
+      }, CALL_REMINDER_SECONDS * 1000);
+      setTimeout(async () => {
+        await bot.changeContext(message.reference);
         controller.trigger("continue_session", bot, message);
       }, CHECK_TIMEOUT_SECONDS * 1000);
       const readable_check_timeout = moment
@@ -265,6 +270,32 @@ ${JSON.stringify(Object.fromEntries(global_state), null, 2)}
       await bot.replyEphemeral(message, message_txt);
     }
   );
+
+  controller.on("check_participants", async (bot, message) => {
+    let channel_state = global_state.get(message.channel);
+    let channel_members = await bot.api.conversations.members({
+      channel: message.channel,
+    });
+    channel_members = channel_members.members;
+    channel_members = channel_members.filter(
+      (member) =>
+        !channel_state.waiting.includes(member) &&
+        !channel_state.done.includes(member) &&
+        member !== "U010MMQGD96" //Removing the ID of Shujinosuke from channel_members
+    );
+    if (channel_members.length > 0) {
+      await channel_members.map((member) =>
+        bot.api.chat.postEphemeral({
+          channel: message.channel,
+          user: member,
+          text: `
+:white_check_mark: <@${member}>さん、今週の週次が始まっています！
+:old_key: 参加する場合は \`@Shujinosuke 参加\` と発言してください！
+`,
+        })
+      );
+    }
+  });
 
   controller.on("continue_session", async (bot, message) => {
     let channel_state = global_state.get(message.channel);
