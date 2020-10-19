@@ -50,6 +50,20 @@ function gen_help_message(message) {
   }
 }
 
+async function remind_to_attendees(bot, message, member) {
+  let custom_status = await bot.api.users.profile.get({ user: member });
+  if (custom_status.profile.status_emoji !== ":yasumi:") {
+    bot.api.chat.postEphemeral({
+      channel: message.channel,
+      user: member,
+      text: `
+:white_check_mark: <@${member}>さん、今週の週次が始まっています！
+:old_key: 参加する場合は \`@Shujinosuke 参加\` と発言してください！
+`,
+    });
+  }
+}
+
 async function join(bot, message) {
   let channel_state = global_state.get(message.channel);
   if (channel_state && message.user) {
@@ -202,7 +216,7 @@ ${JSON.stringify(Object.fromEntries(global_state), null, 2)}
       setTimeout(async () => {
         await bot.changeContext(message.reference);
         controller.trigger("check_participants", bot, message);
-      }, CALL_REMINDER_SECONDS * 1000);
+      }, CALL_REMINDER_SECONDS * 20);
       setTimeout(async () => {
         await bot.changeContext(message.reference);
         controller.trigger("continue_session", bot, message);
@@ -284,18 +298,9 @@ ${JSON.stringify(Object.fromEntries(global_state), null, 2)}
         !channel_state.done.includes(member) &&
         !observers.includes(member) //Removing observers and shujinosuke
     );
-    if (members_not_in_meeting.length > 0) {
-      await members_not_in_meeting.map((member) =>
-        bot.api.chat.postEphemeral({
-          channel: message.channel,
-          user: member,
-          text: `
-:white_check_mark: <@${member}>さん、今週の週次が始まっています！
-:old_key: 参加する場合は \`@Shujinosuke 参加\` と発言してください！
-`,
-        })
-      );
-    }
+    members_not_in_meeting = members_not_in_meeting.map((member) =>
+      remind_to_attendees(bot, message, member)
+    );
   });
 
   controller.on("continue_session", async (bot, message) => {
