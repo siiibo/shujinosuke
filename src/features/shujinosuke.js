@@ -348,6 +348,9 @@ ${JSON.stringify(Object.fromEntries(global_state), null, 2)}
         ":sagyoukaishi:": ["リモートで作業中", ":remote:"],
         ":kinmukaishi:": ["リモートで作業中", ":remote:"],
         ":yasumi:": ["今日は休み", ":yasumi:"],
+        ":taikin:": ["", ""],
+        ":sagyoushuuryou:": ["", ""],
+        ":kinmushuuryou:": ["", ""],
       };
       if (Object.keys(STATE_LIST).includes(message.text)) {
         await bot.api.users.profile.set({
@@ -356,15 +359,6 @@ ${JSON.stringify(Object.fromEntries(global_state), null, 2)}
             status_text: STATE_LIST[message.text][0],
             status_emoji: STATE_LIST[message.text][1],
           },
-        });
-      } else if (
-        [":taikin:", ":sagyoushuuryou:", ":kinmushuuryou:"].includes(
-          message.text
-        )
-      ) {
-        await bot.api.users.profile.set({
-          token: user_token,
-          profile: { status_text: "", status_emoji: "" },
         });
       }
     }
