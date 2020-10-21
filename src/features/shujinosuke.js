@@ -6,6 +6,7 @@ const STARTED = "started";
 const CHECK_TIMEOUT_SECONDS = 1200;
 const ENDING_PERIOD_SECONDS = 300;
 const CALL_REMINDER_SECONDS = 180;
+const ATTENDANCE_CHANNEL = "CL0V50APP";
 
 let global_state = new Map();
 
@@ -335,6 +336,37 @@ ${JSON.stringify(Object.fromEntries(global_state), null, 2)}
   controller.on("block_actions", async (bot, message) => {
     if (message.text === "join") {
       await join(bot, message);
+    }
+  });
+
+  controller.on("message", async (bot, message) => {
+    if (message.channel === ATTENDANCE_CHANNEL) {
+      const user_token = process.env.USERS_TOKEN;
+      const STATE_LIST = {
+        ":shussha:": ["本店勤務中", ":shussha:"],
+        ":shukkin:": ["本店勤務中", ":shussha:"],
+        ":sagyoukaishi:": ["リモートで作業中", ":remote:"],
+        ":kinmukaishi:": ["リモートで作業中", ":remote:"],
+        ":yasumi:": ["今日は休み", ":yasumi:"],
+      };
+      if (Object.keys(STATE_LIST).includes(message.text)) {
+        await bot.api.users.profile.set({
+          token: user_token,
+          profile: {
+            status_text: STATE_LIST[message.text][0],
+            status_emoji: STATE_LIST[message.text][1],
+          },
+        });
+      } else if (
+        [":taikin:", ":sagyoushuuryou:", ":kinmushuuryou:"].includes(
+          message.text
+        )
+      ) {
+        await bot.api.users.profile.set({
+          token: user_token,
+          profile: { status_text: "", status_emoji: "" },
+        });
+      }
     }
   });
 };
