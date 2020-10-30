@@ -292,15 +292,15 @@ ${JSON.stringify(Object.fromEntries(global_state), null, 2)}
     async (bot, message) => {
       const MESSAGE_TXT =
         ":male-technologist: こちらが現在勤務している皆さんです！\n\n:speaker: DMを送るには名前をクリックしてください！\n\n";
-      let attendees_arr = [];
-      let all_members = await bot.api.users.list({});
-      all_members = all_members.members;
-      let attendees = await all_members.filter(
+      const all_members_response = await bot.api.users.list({});
+      const all_members = all_members_response.members;
+      const attendees = all_members.filter(
         (member) =>
           !["", ":yasumi:", ":gaishutsu:"].includes(member.profile.status_emoji)
       );
-      attendees.map((attendee) => attendees_arr.push(`<@${attendee.id}>`));
-      attendees_txt = attendees_arr.join("\n\n");
+      const attendees_txt = attendees
+        .map((attendee) => attendees_arr.push(`<@${attendee.id}>`))
+        .join(" ");
       await bot.replyEphemeral(message, MESSAGE_TXT + attendees_txt);
     }
   );
@@ -318,7 +318,7 @@ ${JSON.stringify(Object.fromEntries(global_state), null, 2)}
         !channel_state.done.includes(member) &&
         !observers.includes(member) //Removing observers and shujinosuke
     );
-    members_not_in_meeting = members_not_in_meeting.map((member) =>
+    members_not_in_meeting.map((member) =>
       remind_to_attendees(bot, message, member)
     );
   });
