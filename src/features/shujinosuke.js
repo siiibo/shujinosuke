@@ -286,6 +286,25 @@ ${JSON.stringify(Object.fromEntries(global_state), null, 2)}
     }
   );
 
+  controller.hears(
+    /^(誰いる？||今日いる人は？)$/,
+    "direct_mention",
+    async (bot, message) => {
+      const MESSAGE_TXT =
+        ":male-technologist: こちらが現在勤務している皆さんです！\n\n:speaker: DMを送るには名前をクリックしてください！\n\n";
+      let attendees_arr = [];
+      let all_members = await bot.api.users.list({});
+      all_members = all_members.members;
+      let attendees = await all_members.filter(
+        (member) =>
+          !["", ":yasumi:", ":gaishutsu:"].includes(member.profile.status_emoji)
+      );
+      attendees.map((attendee) => attendees_arr.push(`<@${attendee.id}>`));
+      attendees_txt = attendees_arr.join("\n\n");
+      await bot.replyEphemeral(message, MESSAGE_TXT + attendees_txt);
+    }
+  );
+
   controller.on("check_participants", async (bot, message) => {
     const observers = ["U010MMQGD96", "UU8H6MKEU"]; //Shujinosuke and observers
     let channel_state = global_state.get(message.channel);
