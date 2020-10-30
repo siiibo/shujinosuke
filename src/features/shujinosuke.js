@@ -5,7 +5,7 @@ const SLEEPING = "sleeping";
 const STARTED = "started";
 const CHECK_TIMEOUT_SECONDS = 1200;
 const ENDING_PERIOD_SECONDS = 300;
-const CALL_REMINDER_SECONDS = 180;
+const CALL_REMINDER_SECONDS = 1;
 const ATTENDANCE_CHANNEL = "CL0V50APP";
 
 let global_state = new Map();
@@ -52,14 +52,16 @@ function gen_help_message(message) {
 }
 
 async function remind_to_attendees(bot, message, member) {
-  let custom_status = await bot.api.users.profile.get({ user: member });
-  if (custom_status.profile.status_emoji !== ":yasumi:") {
+  let user_presence_response = await bot.api.users.getPresence({
+    user: member,
+  });
+  if (user_presence_response.presence === "active") {
     bot.api.chat.postEphemeral({
       channel: message.channel,
       user: member,
       text: `
 :white_check_mark: <@${member}>さん、今週の週次が始まっています！
-:old_key: 参加する場合は \`@Shujinosuke 参加\` と発言してください！
+:old_key: 参加する場合は 「参加」ボタンをクリックか、 \`@Shujinosuke 参加\` と発言してください！
 `,
     });
   }
