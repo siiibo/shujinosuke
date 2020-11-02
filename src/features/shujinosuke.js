@@ -6,7 +6,6 @@ const STARTED = "started";
 const CHECK_TIMEOUT_SECONDS = 1200;
 const ENDING_PERIOD_SECONDS = 300;
 const CALL_REMINDER_SECONDS = 180;
-const ATTENDANCE_CHANNEL = "CL0V50APP";
 
 let global_state = new Map();
 
@@ -15,6 +14,7 @@ const help_commands_off = {
   Botステータスの確認: "`status`",
   ping: "`ping`",
   ヘルプ: "`ヘルプ` `help`",
+  アクティブメンバーの確認: "`誰いる？` `今いる人は？`",
 };
 const help_commands_on = {
   レポートの投稿:
@@ -27,6 +27,7 @@ const help_commands_on = {
   Botステータスの確認: "`status`",
   ping: "`ping`",
   ヘルプ: "`ヘルプ` `help`",
+  アクティブメンバーの確認: "`誰いる？` `今いる人は？`",
 };
 
 function gen_help_message(message) {
