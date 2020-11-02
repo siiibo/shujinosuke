@@ -289,19 +289,30 @@ ${JSON.stringify(Object.fromEntries(global_state), null, 2)}
   );
 
   controller.hears(
-    /^(誰いる？||今日いる人は？)$/,
+    /^(誰いる？||今いる人は？)$/,
     "direct_mention",
     async (bot, message) => {
       const MESSAGE_TXT =
-        ":male-technologist: こちらが現在勤務している皆さんです！\n\n:speaker: DMを送るには名前をクリックしてください！\n\n";
+        ":male-technologist: こちらが現在勤務している方々です！\n\n:speaker: DMを送るには名前をクリックしてください！\n\n";
       const all_members_response = await bot.api.users.list({});
       const all_members = all_members_response.members;
-      const attendees = all_members.filter(
-        (member) =>
-          !["", ":yasumi:", ":gaishutsu:"].includes(member.profile.status_emoji)
+      const reduced_members = all_members.filter(
+        (member) => !member.deleted && !member.is_bot && !member.is_restricted
       );
-      const attendees_txt = attendees
-        .map((attendee) => attendees_arr.push(`<@${attendee.id}>`))
+      let attendees_id = await Promise.all(
+        reduced_members.map(async (member) => {
+          const presence_response = await bot.api.users.getPresence({
+            user: member.id,
+          });
+          if (presence_response.presence === "active") {
+            return member.id;
+          }
+        })
+      );
+      const attendees_id_arr = Object.values(attendees_id);
+      const attendees_txt = attendees_id_arr
+        .filter((attendee_id) => attendee_id)
+        .map((attendee_id) => `<@${attendee_id}>`)
         .join(" ");
       await bot.replyEphemeral(message, MESSAGE_TXT + attendees_txt);
     }
