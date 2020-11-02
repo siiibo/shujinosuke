@@ -5,7 +5,7 @@ const SLEEPING = "sleeping";
 const STARTED = "started";
 const CHECK_TIMEOUT_SECONDS = 1200;
 const ENDING_PERIOD_SECONDS = 300;
-const CALL_REMINDER_SECONDS = 1;
+const CALL_REMINDER_SECONDS = 180;
 const ATTENDANCE_CHANNEL = "CL0V50APP";
 
 let global_state = new Map();
