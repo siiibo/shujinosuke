@@ -370,29 +370,4 @@ ${JSON.stringify(Object.fromEntries(global_state), null, 2)}
       await join(bot, message);
     }
   });
-
-  controller.on("message", async (bot, message) => {
-    if (message.channel === ATTENDANCE_CHANNEL) {
-      const user_token = process.env.USERS_TOKEN;
-      const STATE_LIST = {
-        ":shussha:": ["本店勤務中", ":shussha:"],
-        ":shukkin:": ["本店勤務中", ":shussha:"],
-        ":sagyoukaishi:": ["リモートで作業中", ":remote:"],
-        ":kinmukaishi:": ["リモートで作業中", ":remote:"],
-        ":yasumi:": ["今日は休み", ":yasumi:"],
-        ":taikin:": ["", ""],
-        ":sagyoushuuryou:": ["", ""],
-        ":kinmushuuryou:": ["", ""],
-      };
-      if (Object.keys(STATE_LIST).includes(message.text)) {
-        await bot.api.users.profile.set({
-          token: user_token,
-          profile: {
-            status_text: STATE_LIST[message.text][0],
-            status_emoji: STATE_LIST[message.text][1],
-          },
-        });
-      }
-    }
-  });
 };
