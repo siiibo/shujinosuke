@@ -293,31 +293,36 @@ ${JSON.stringify(Object.fromEntries(global_state), null, 2)}
     /^(誰いる？||今いる人は？)$/,
     "direct_mention",
     async (bot, message) => {
-      const MESSAGE_TXT =
-        ":male-technologist: こちらが現在勤務している方々です！\n\n:speaker: DMを送るには名前をクリックしてください！\n\n";
-      const all_members_response = await bot.api.users.list({});
-      const all_members = all_members_response.members;
-      const reduced_members = all_members.filter(
-        (member) => !member.deleted && !member.is_bot && !member.is_restricted
-      );
-      let attendees_id = await Promise.all(
-        reduced_members.map(async (member) => {
-          const presence_response = await bot.api.users.getPresence({
-            user: member.id,
-          });
-          if (presence_response.presence === "active") {
-            return member.id;
-          }
-        })
-      );
-      const attendees_id_arr = Object.values(attendees_id);
-      const attendees_txt = attendees_id_arr
-        .filter((attendee_id) => attendee_id)
-        .map((attendee_id) => `<@${attendee_id}>`)
-        .join(" ");
-      await bot.replyEphemeral(message, MESSAGE_TXT + attendees_txt);
+      await bot.changeContext(message.reference);
+      controller.trigger("reply_attendees", bot, message);
     }
   );
+
+  controller.on("reply_attendees", async (bot, message) => {
+    const message_txt =
+      ":male-technologist: こちらが現在勤務している方々です！\n\n:speaker: DMを送るには名前をクリックし、「メッセージ」を選択してください！\n\n";
+    const all_members_response = await bot.api.users.list({});
+    const all_members = all_members_response.members;
+    // remove deleted accounts, bots and outsourcees
+    const reduced_members = all_members.filter(
+      (member) => !member.deleted && !member.is_bot && !member.is_restricted
+    );
+    const attendees_id = await Promise.all(
+      reduced_members.map(async (member) => {
+        const presence_response = await bot.api.users.getPresence({
+          user: member.id,
+        });
+        if (presence_response.presence === "active") {
+          return member.id;
+        }
+      })
+    );
+    const attendees_txt = attendees_id
+      .filter((attendee_id) => attendee_id)
+      .map((attendee_id) => `<@${attendee_id}>`)
+      .join(" ");
+    await bot.replyEphemeral(message, message_txt + attendees_txt);
+  });
 
   controller.on("check_participants", async (bot, message) => {
     const observers = ["U010MMQGD96", "UU8H6MKEU"]; //Shujinosuke and observers
