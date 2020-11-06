@@ -302,7 +302,7 @@ ${JSON.stringify(Object.fromEntries(global_state), null, 2)}
     const message_txt = `
   :male-technologist: こちらが現在Slack上でアクティブな方々です！
   :speaker: DMを送るには名前をクリックし、「メッセージ」を選択してください！
-  :warning: あくまで状態がアクティブなユーザーを表示しているので、勤務者とは限りません。
+  :warning: あくまでSlackの状態がアクティブなユーザーを表示しているので、勤務しているとは限りません。
   `;
     const all_members_response = await bot.api.users.list({});
     const all_members = all_members_response.members;
