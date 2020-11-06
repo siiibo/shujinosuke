@@ -5,6 +5,7 @@ const SLEEPING = "sleeping";
 const STARTED = "started";
 const CHECK_TIMEOUT_SECONDS = 1200;
 const ENDING_PERIOD_SECONDS = 300;
+const CALL_REMINDER_SECONDS = 180;
 
 let global_state = new Map();
 
@@ -13,6 +14,7 @@ const help_commands_off = {
   Botステータスの確認: "`status`",
   ping: "`ping`",
   ヘルプ: "`ヘルプ` `help`",
+  アクティブメンバーの確認: "`誰いる？` `今いる人は？`",
 };
 const help_commands_on = {
   レポートの投稿:
@@ -25,6 +27,7 @@ const help_commands_on = {
   Botステータスの確認: "`status`",
   ping: "`ping`",
   ヘルプ: "`ヘルプ` `help`",
+  アクティブメンバーの確認: "`誰いる？` `今いる人は？`",
 };
 
 function gen_help_message(message) {
@@ -46,6 +49,22 @@ function gen_help_message(message) {
       ':books:会議中にShujinosukeで使えるコマンドは以下の通りです！\n:bulb:コマンドの前には必ず "@Shujinosuke" をつけましょう！\n\n' +
       commands
     );
+  }
+}
+
+async function remind_to_attendees(bot, message, member) {
+  let user_presence_response = await bot.api.users.getPresence({
+    user: member,
+  });
+  if (user_presence_response.presence === "active") {
+    bot.api.chat.postEphemeral({
+      channel: message.channel,
+      user: member,
+      text: `
+:white_check_mark: <@${member}>さん、今週の週次が始まっています！
+:old_key: 参加する場合は 「参加」ボタンをクリックか、 \`@Shujinosuke 参加\` と発言してください！
+`,
+    });
   }
 }
 
@@ -200,6 +219,10 @@ ${JSON.stringify(Object.fromEntries(global_state), null, 2)}
       global_state.set(message.channel, { waiting: [], done: [] });
       setTimeout(async () => {
         await bot.changeContext(message.reference);
+        controller.trigger("check_participants", bot, message);
+      }, CALL_REMINDER_SECONDS * 1000);
+      setTimeout(async () => {
+        await bot.changeContext(message.reference);
         controller.trigger("continue_session", bot, message);
       }, CHECK_TIMEOUT_SECONDS * 1000);
       const readable_check_timeout = moment
@@ -265,6 +288,64 @@ ${JSON.stringify(Object.fromEntries(global_state), null, 2)}
       await bot.replyEphemeral(message, message_txt);
     }
   );
+
+  controller.hears(
+    /^(誰いる？||今いる人は？)$/,
+    "direct_mention",
+    async (bot, message) => {
+      await bot.changeContext(message.reference);
+      controller.trigger("reply_attendees", bot, message);
+    }
+  );
+
+  controller.on("reply_attendees", async (bot, message) => {
+    const message_txt = `
+  :male-technologist: こちらが現在Slack上でアクティブな方々です！
+  :speaker: DMを送るには名前をクリックし、「メッセージ」を選択してください！
+  :warning: あくまでSlackの状態がアクティブなユーザーを表示しているので、勤務しているとは限りません。
+  `;
+    const all_members_response = await bot.api.users.list({});
+    const all_members = all_members_response.members;
+    // remove deleted accounts, bots and outsourcees
+    const reduced_members = all_members.filter(
+      (member) => !member.deleted && !member.is_bot && !member.is_restricted
+    );
+    const attendees_id = await Promise.all(
+      reduced_members.map(async (member) => {
+        const presence_response = await bot.api.users.getPresence({
+          user: member.id,
+        });
+        if (presence_response.presence === "active") {
+          return member.id;
+        } else {
+          return null;
+        }
+      })
+    );
+    const attendees_txt = attendees_id
+      .filter((attendee_id) => attendee_id != null)
+      .map((attendee_id) => `<@${attendee_id}>`)
+      .join(" ");
+    await bot.replyEphemeral(message, message_txt + attendees_txt);
+  });
+
+  controller.on("check_participants", async (bot, message) => {
+    const observers = ["U010MMQGD96", "UU8H6MKEU"]; //Shujinosuke and observers
+    let channel_state = global_state.get(message.channel);
+    let channel_members = await bot.api.conversations.members({
+      channel: message.channel,
+    });
+    channel_members = channel_members.members;
+    let members_not_in_meeting = channel_members.filter(
+      (member) =>
+        !channel_state.waiting.includes(member) &&
+        !channel_state.done.includes(member) &&
+        !observers.includes(member) //Removing observers and shujinosuke
+    );
+    members_not_in_meeting.map((member) =>
+      remind_to_attendees(bot, message, member)
+    );
+  });
 
   controller.on("continue_session", async (bot, message) => {
     let channel_state = global_state.get(message.channel);
