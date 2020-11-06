@@ -302,7 +302,7 @@ ${JSON.stringify(Object.fromEntries(global_state), null, 2)}
     const message_txt = `
   :male-technologist: こちらが現在Slack上でアクティブな方々です！
   :speaker: DMを送るには名前をクリックし、「メッセージ」を選択してください！
-  :warning: あくまで状態がアクティブなユーザーを表示しているので、勤務者とは限りません。
+  :warning: あくまでSlackの状態がアクティブなユーザーを表示しているので、勤務しているとは限りません。
   `;
     const all_members_response = await bot.api.users.list({});
     const all_members = all_members_response.members;
@@ -317,11 +317,13 @@ ${JSON.stringify(Object.fromEntries(global_state), null, 2)}
         });
         if (presence_response.presence === "active") {
           return member.id;
+        } else {
+          return null;
         }
       })
     );
     const attendees_txt = attendees_id
-      .filter((attendee_id) => attendee_id)
+      .filter((attendee_id) => attendee_id != null)
       .map((attendee_id) => `<@${attendee_id}>`)
       .join(" ");
     await bot.replyEphemeral(message, message_txt + attendees_txt);
