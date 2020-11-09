@@ -298,6 +298,16 @@ ${JSON.stringify(Object.fromEntries(global_state), null, 2)}
     }
   );
 
+  controller.on("emoji_changed", async (bot, message) => {
+    if (message.subtype === "add") {
+      const emoji_added_txt = `新しいカスタム絵文字 :${message.name}: が追加されました！`;
+      await bot.api.chat.postMessage({
+        channel: "C01CAKK0TQ9",
+        text: emoji_added_txt,
+      });
+    }
+  });
+
   controller.on("reply_attendees", async (bot, message) => {
     const message_txt = `
   :male-technologist: こちらが現在Slack上でアクティブな方々です！
