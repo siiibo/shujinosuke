@@ -298,11 +298,11 @@ ${JSON.stringify(Object.fromEntries(global_state), null, 2)}
     }
   );
 
-  controller.on("emoji_changed", async (bot, message) => {
+  controller.on("add", async (bot, message) => {
     if (message.subtype === "add") {
       const emoji_added_txt = `新しいカスタム絵文字 :${message.name}: が追加されました！`;
       await bot.api.chat.postMessage({
-        channel: "C01CAKK0TQ9",
+        channel: "C01AQPDC9S4",
         text: emoji_added_txt,
       });
     }
