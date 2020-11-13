@@ -301,11 +301,8 @@ ${JSON.stringify(Object.fromEntries(global_state), null, 2)}
   controller.on("add", async (bot, message) => {
     if (message.subtype === "add") {
       await bot.api.chat.postMessage({
-        channel: "C011BG29K71",
-        text: `
-新しいカスタム絵文字 :${message.name}: が追加されました！
-エイリアスは \"${message.name}\" です！
-`,
+        channel: "C011BG29K71", //post to "雑談" channel
+        text: `:${message.name}:  (\`:${message.name}:\`)が追加されました！`,
       });
     }
   });
