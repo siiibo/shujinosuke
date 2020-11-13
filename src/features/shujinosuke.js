@@ -298,6 +298,15 @@ ${JSON.stringify(Object.fromEntries(global_state), null, 2)}
     }
   );
 
+  controller.on("add", async (bot, message) => {
+    if (message.subtype === "add") {
+      await bot.api.chat.postMessage({
+        channel: "C011BG29K71", //post to "雑談" channel
+        text: `:${message.name}:  (\`:${message.name}:\`)が追加されました！`,
+      });
+    }
+  });
+
   controller.on("reply_attendees", async (bot, message) => {
     const message_txt = `
   :male-technologist: こちらが現在Slack上でアクティブな方々です！
