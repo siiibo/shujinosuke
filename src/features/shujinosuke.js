@@ -172,7 +172,7 @@ module.exports = function (controller) {
   });
 
   controller.hears(
-    /^(終了|リセット|reset)$/,
+    /^(終了|リセット|reset)$/i,
     "direct_mention",
     async (bot, message) => {
       const state_dump = JSON.stringify(
@@ -190,7 +190,7 @@ ${state_dump}
     }
   );
 
-  controller.hears(/^status$/, "direct_mention", async (bot, message) => {
+  controller.hears(/^status$/i, "direct_mention", async (bot, message) => {
     await bot.say(`
 \`\`\`
 ${JSON.stringify(Object.fromEntries(global_state), null, 2)}
@@ -199,7 +199,7 @@ ${JSON.stringify(Object.fromEntries(global_state), null, 2)}
   });
 
   controller.hears(
-    /^ping$/,
+    /^ping$/i,
     "direct_mention,direct_message",
     async (bot, message) => {
       await bot.replyEphemeral(
@@ -281,7 +281,7 @@ ${JSON.stringify(Object.fromEntries(global_state), null, 2)}
   });
 
   controller.hears(
-    /^(ヘルプ|help)$/,
+    /^(ヘルプ|help)$/i,
     "direct_mention",
     async (bot, message) => {
       let message_txt = gen_help_message(message);
