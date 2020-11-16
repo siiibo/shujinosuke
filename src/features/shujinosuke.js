@@ -23,7 +23,7 @@ const help_commands_on = {
   会議の強制終了: "`終了` `リセット` `reset`",
   会議へ参加: "`参加`",
   参加の取り消し: "`キャンセル`",
-  レポート未投稿者の確認: "`誰？`",
+  レポート未投稿者の確認: "`誰？` `残りは？`",
   Botステータスの確認: "`status`",
   ping: "`ping`",
   ヘルプ: "`ヘルプ` `help`",
@@ -153,26 +153,32 @@ module.exports = function (controller) {
     }
   });
 
-  controller.hears(/誰？$/, "direct_mention", async (bot, message) => {
-    let channel_state = global_state.get(message.channel);
-    if (channel_state) {
-      if (channel_state.waiting.length > 0) {
-        const remaining = channel_state.waiting
-          .map((value, _index, _array) => `<@${value}>`)
-          .join(", ");
-        await bot.say(`
+  controller.hears(
+    /(^残りは[？?]?|誰[？?]?$)/,
+    "direct_mention",
+    async (bot, message) => {
+      let channel_state = global_state.get(message.channel);
+      if (channel_state) {
+        if (channel_state.waiting.length > 0) {
+          const remaining = channel_state.waiting
+            .map((value, _index, _array) => `<@${value}>`)
+            .join(", ");
+          await bot.say(`
 :point_right: 残りは${remaining}です。
 :fast_forward: 急用ができたら「 *@Shujinosuke キャンセル* 」もできます。
 :question: 私がちゃんと反応しなかった場合、削除して投稿し直してみてください。
 `);
-      } else {
-        await bot.say(":point_up: 今は全体連絡とレポートレビューの時間です。");
+        } else {
+          await bot.say(
+            ":point_up: 今は全体連絡とレポートレビューの時間です。"
+          );
+        }
       }
     }
-  });
+  );
 
   controller.hears(
-    /^(終了|リセット|reset)$/,
+    /^(終了|リセット|reset)$/i,
     "direct_mention",
     async (bot, message) => {
       const state_dump = JSON.stringify(
@@ -190,7 +196,7 @@ ${state_dump}
     }
   );
 
-  controller.hears(/^status$/, "direct_mention", async (bot, message) => {
+  controller.hears(/^status$/i, "direct_mention", async (bot, message) => {
     await bot.say(`
 \`\`\`
 ${JSON.stringify(Object.fromEntries(global_state), null, 2)}
@@ -199,7 +205,7 @@ ${JSON.stringify(Object.fromEntries(global_state), null, 2)}
   });
 
   controller.hears(
-    /^ping$/,
+    /^ping$/i,
     "direct_mention,direct_message",
     async (bot, message) => {
       await bot.replyEphemeral(
@@ -281,7 +287,7 @@ ${JSON.stringify(Object.fromEntries(global_state), null, 2)}
   });
 
   controller.hears(
-    /^(ヘルプ|help)$/,
+    /^(ヘルプ|help)$/i,
     "direct_mention",
     async (bot, message) => {
       let message_txt = gen_help_message(message);
@@ -290,7 +296,7 @@ ${JSON.stringify(Object.fromEntries(global_state), null, 2)}
   );
 
   controller.hears(
-    /^(誰いる？||今いる人は？)$/,
+    /^(誰いる[？?]?|今?いる人.*)$/,
     "direct_mention",
     async (bot, message) => {
       await bot.changeContext(message.reference);
