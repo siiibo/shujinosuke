@@ -296,7 +296,7 @@ ${JSON.stringify(Object.fromEntries(global_state), null, 2)}
   );
 
   controller.hears(
-    /^(誰いる[？?]?||今?いる人.*||)$/,
+    /^(誰いる[？?]?|今?いる人.*)$/,
     "direct_mention",
     async (bot, message) => {
       await bot.changeContext(message.reference);
