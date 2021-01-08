@@ -18,7 +18,7 @@ const help_commands_off = {
 };
 const help_commands_on = {
   レポートの投稿:
-    "`レポート` `先週から注力してうまくいったこと`\n`苦戦していること` `来週にかけて注力すること`",
+    "`1. 今週のdeliverables / doables`\n `2. 調子、出来事、悩み等`\n`3. 来週のdeliverables / doables`",
   会議の開始: "`開始`",
   会議の強制終了: "`終了` `リセット` `reset`",
   会議へ参加: "`参加`",
@@ -108,11 +108,9 @@ module.exports = function (controller) {
   // Pickup reports. This is the most prioritized pattern in the session.
   controller.hears(
     [
-      /^レポート/,
-      /<@U010MMQGD96> +レポート/,
-      /先週から注力してうまくいったこと/,
-      /苦戦していること/,
-      /来週にかけて注力すること/,
+      /1. 今週のdeliverables \/ doables/,
+      /2. 調子、出来事、悩み等/,
+      /3. 来週のdeliverables \/ doables/,
     ],
     "direct_mention,mention,message",
     async (bot, message) => {
@@ -257,12 +255,11 @@ ${JSON.stringify(Object.fromEntries(global_state), null, 2)}
             text: {
               type: "mrkdwn",
               text: `
-@Shujinosuke レポート
-*先週から注力してうまくいったこと（＋新たな知見）*
+*1. 今週のdeliverables / doables *
 ...
-*苦戦していること（助けがいる場合はその旨）*
+*2. 調子、出来事、悩み等 *
 ...
-*来週にかけて注力すること*
+*3. 来週のdeliverables / doables *
 ...
 `,
             },
