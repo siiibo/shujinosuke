@@ -108,9 +108,10 @@ module.exports = function (controller) {
   // Pickup reports. This is the most prioritized pattern in the session.
   controller.hears(
     [
-      /1. 今週のdeliverables \/ doables/,
-      /2. 調子、出来事、悩み等/,
-      /3. 来週のdeliverables \/ doables/,
+      /^レポート/,
+      /今週のdeliverables \/ doables/,
+      /調子、出来事、悩み等/,
+      /来週のdeliverables \/ doables/,
     ],
     "direct_mention,mention,message",
     async (bot, message) => {
@@ -256,11 +257,15 @@ ${JSON.stringify(Object.fromEntries(global_state), null, 2)}
               type: "mrkdwn",
               text: `
 *1. 今週のdeliverables / doables *
-...
+... / ...
+... / ...
+... / ...
 *2. 調子、出来事、悩み等 *
 ...
 *3. 来週のdeliverables / doables *
-...
+... / ...
+... / ...
+... / ...
 `,
             },
           },
