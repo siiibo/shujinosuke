@@ -18,7 +18,7 @@ const help_commands_off = {
 };
 const help_commands_on = {
   レポートの投稿:
-    "`1. 今週のdeliverables / doables`\n `2. 調子、出来事、悩み等`\n`3. 来週のdeliverables / doables`",
+    "`レポート` `<規定タイトル（例: 今週のdeliverables / doables）を含む文章>`",
   会議の開始: "`開始`",
   会議の強制終了: "`終了` `リセット` `reset`",
   会議へ参加: "`参加`",
