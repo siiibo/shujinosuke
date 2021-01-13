@@ -18,7 +18,7 @@ const help_commands_off = {
 };
 const help_commands_on = {
   レポートの投稿:
-    "`レポート` `先週から注力してうまくいったこと`\n`苦戦していること` `来週にかけて注力すること`",
+    "`レポート` `<規定タイトル（例: 今週のdeliverables / doables）を含む文章>`",
   会議の開始: "`開始`",
   会議の強制終了: "`終了` `リセット` `reset`",
   会議へ参加: "`参加`",
@@ -109,10 +109,9 @@ module.exports = function (controller) {
   controller.hears(
     [
       /^レポート/,
-      /<@U010MMQGD96> +レポート/,
-      /先週から注力してうまくいったこと/,
-      /苦戦していること/,
-      /来週にかけて注力すること/,
+      /今週のdeliverables \/ doables/,
+      /調子、出来事、悩み等/,
+      /来週のdeliverables \/ doables/,
     ],
     "direct_mention,mention,message",
     async (bot, message) => {
@@ -257,13 +256,16 @@ ${JSON.stringify(Object.fromEntries(global_state), null, 2)}
             text: {
               type: "mrkdwn",
               text: `
-@Shujinosuke レポート
-*先週から注力してうまくいったこと（＋新たな知見）*
+*1. 今週のdeliverables / doables *
+... / ...
+... / ...
+... / ...
+*2. 調子、出来事、悩み等 *
 ...
-*苦戦していること（助けがいる場合はその旨）*
-...
-*来週にかけて注力すること*
-...
+*3. 来週のdeliverables / doables *
+... / ...
+... / ...
+... / ...
 `,
             },
           },
