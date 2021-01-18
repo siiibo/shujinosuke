@@ -107,12 +107,7 @@ module.exports = function (controller) {
 
   // Pickup reports. This is the most prioritized pattern in the session.
   controller.hears(
-    [
-      /^レポート/,
-      /今週のdeliverables \/ doables/,
-      /調子、出来事、悩み等/,
-      /来週のdeliverables \/ doables/,
-    ],
+    [/^レポート/, /調子、出来事、悩み等/],
     "direct_mention,mention,message",
     async (bot, message) => {
       let channel_state = global_state.get(message.channel);
