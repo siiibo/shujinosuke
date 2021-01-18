@@ -17,8 +17,7 @@ const help_commands_off = {
   アクティブメンバーの確認: "`誰いる？` `今いる人は？`",
 };
 const help_commands_on = {
-  レポートの投稿:
-    "`レポート` `<規定タイトル（例: 今週のdeliverables / doables）を含む文章>`",
+  レポートの投稿: "`レポート` `調子、出来事、悩み等`",
   会議の開始: "`開始`",
   会議の強制終了: "`終了` `リセット` `reset`",
   会議へ参加: "`参加`",
@@ -251,16 +250,9 @@ ${JSON.stringify(Object.fromEntries(global_state), null, 2)}
             text: {
               type: "mrkdwn",
               text: `
-*1. 今週のdeliverables / doables *
-... / ...
-... / ...
-... / ...
-*2. 調子、出来事、悩み等 *
+@Shujinosuke レポート
+*・ 調子、出来事、悩み等*
 ...
-*3. 来週のdeliverables / doables *
-... / ...
-... / ...
-... / ...
 `,
             },
           },
