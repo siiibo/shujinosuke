@@ -252,6 +252,7 @@ ${JSON.stringify(Object.fromEntries(global_state), null, 2)}
               text: `
 @Shujinosuke レポート
 *調子、出来事、悩み等*
+
 * ...
 * ...
 `,
