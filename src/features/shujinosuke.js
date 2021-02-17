@@ -236,7 +236,7 @@ ${JSON.stringify(Object.fromEntries(global_state), null, 2)}
               text: `
 :spiral_calendar_pad: 週次定例を始めます！
 :mega: 参加者は「:rocket: 参加」ボタンをクリックか、「 *@Shujinosuke 参加* 」と返信！
-:clipboard: 以下をコピーしてレポートをまとめ、できたらどんどん投稿しましょう！
+:clipboard: 以下をコピーして書き換えてレポートをまとめ、できたらどんどん投稿しましょう！
 :stopwatch: ${readable_check_timeout}後にリマインドし、全員投稿したら全体連絡の時間に移ります。
 :question: 私がちゃんと反応しなかった場合、投稿を一度削除して投稿し直してみてください。
 `,
@@ -253,8 +253,8 @@ ${JSON.stringify(Object.fromEntries(global_state), null, 2)}
 @Shujinosuke レポート
 *調子、出来事、悩み等*
 
-* ...
-* ...
+* サーバの電流から酸っぱい味がする
+* 水曜日以外やることがあんまりなくて暇だ
 `,
             },
           },
