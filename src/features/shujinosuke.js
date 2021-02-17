@@ -251,8 +251,9 @@ ${JSON.stringify(Object.fromEntries(global_state), null, 2)}
               type: "mrkdwn",
               text: `
 @Shujinosuke レポート
-*・ 調子、出来事、悩み等*
-...
+*調子、出来事、悩み等*
+* ...
+* ...
 `,
             },
           },
