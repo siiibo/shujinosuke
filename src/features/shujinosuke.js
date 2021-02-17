@@ -239,6 +239,7 @@ ${JSON.stringify(Object.fromEntries(global_state), null, 2)}
 :clipboard: 以下をコピーして書き換えてレポートをまとめ、できたらどんどん投稿しましょう！
 :stopwatch: ${readable_check_timeout}後にリマインドし、全員投稿したら全体連絡の時間に移ります。
 :question: 私がちゃんと反応しなかった場合、投稿を一度削除して投稿し直してみてください。
+:google: こちらのMeetに参加しておしゃべりもどうぞ！ https://meet.google.com/gsa-wivy-jnu
 `,
             },
           },
