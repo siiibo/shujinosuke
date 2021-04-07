@@ -2,7 +2,7 @@ import { SlackEvent, GenericMessageEvent, AppMentionEvent, EmojiChangedEvent } f
 import { join, leave, initialize, terminate } from "./channelState";
 import { checkAllReported, makeDoneFromWaiting, getChannelState } from "./channelState";
 import { checkParticipants } from './channelState'
-import { CHECK_TIMEOUT_SECONDS, SlackClient } from './index';
+import { CHECK_TIMEOUT_SECONDS, EMOJI_EVENT_POST_CHANNEL,SlackClient } from './index';
 import { getReadableTime } from './utilities'
 
 const getHelpMessage = (channelId: string) => {
@@ -256,7 +256,7 @@ export const handleAppMention = (slackClient: SlackClient, appMentionEvent: AppM
 const handleEmojiChange = (client: SlackClient, event: EmojiChangedEvent) => {
   if (event.subtype === 'add') {
     client.chat.postMessage({
-      channel: 'CVBPDHEU9',
+      channel: EMOJI_EVENT_POST_CHANNEL,
       text: `:${event.name}:  (\`:${event.name}:\`)が追加されました！`
     });
   }

@@ -4,11 +4,10 @@ import { handleSlackEvent } from './eventHandler'
 import { GasWebClient as SlackClient } from '@hi-se/web-api';
 import {checkParticipants, continueSession, endSession} from './channelState'
 
-const TOKEN_SHEET_ID = '1QtAvBmhtClFJJ3nbJz9rsD_Rl3p5WO0q4B9yNuWJ8cA';
-
-
 export { SlackClient }
 
+const TOKEN_SHEET_ID = '1QtAvBmhtClFJJ3nbJz9rsD_Rl3p5WO0q4B9yNuWJ8cA';
+export const EMOJI_EVENT_POST_CHANNEL = "C011BG29K71" // #雑談
 export const CHECK_TIMEOUT_SECONDS = 1200;
 export const ENDING_PERIOD_SECONDS = 300;
 export const CALL_REMINDER_SECONDS = 180;
