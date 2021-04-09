@@ -107,9 +107,9 @@ export const checkAllReported = (client: SlackClient, channelId: string) => {
     client.chat.postMessage({
       channel: channelId,
       text: (
-        `:+1: 全員のレポートが完了しました！` +
-        `:stopwatch: それでは、${getReadableTime(ENDING_PERIOD_SECONDS)}ほど時間を取りますので、全体連絡のある方はお願いします。` +
-        `eyes: また、この時間で皆さんのレポートを読んでコメントしましょう！（もちろん時間が過ぎたあとも続けて:ok:）`
+        `:+1: 全員のレポートが完了しました！\n` +
+        `:stopwatch: それでは、${getReadableTime(ENDING_PERIOD_SECONDS)}ほど時間を取りますので、全体連絡のある方はお願いします。\n` +
+        `:eyes: また、この時間で皆さんのレポートを読んでコメントしましょう！（もちろん時間が過ぎたあとも続けて:ok:）`
       )
     })
   }
