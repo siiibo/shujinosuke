@@ -30,7 +30,7 @@ export const getSlackClient = () => {
 
 
 const doPost = (e: GoogleAppsScript.Events.DoPost) => {
-  console.info(`doPost raw event :  ${e}`);
+  console.info(`[doPost raw event]\n\n${JSON.stringify(e)}`);
   if (isUrlVerification(e)) {
     return ContentService.createTextOutput(JSON.parse(e.postData.contents)['challenge']);
   }
