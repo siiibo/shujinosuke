@@ -74,6 +74,7 @@ export const continueSession = () => {
       )
     })
   } else {
+    terminate(sessionChannelId);
     client.chat.postMessage({
       channel: sessionChannelId,
       text: `:fast_forward: 終了します。`
