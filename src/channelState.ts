@@ -46,7 +46,6 @@ export const checkParticipants = async () => {
       !channelState.waiting.includes(userId)
     )
   });
-  console.log(remindTargets);
   remindTargets.forEach(async (remindTarget) => {
     if ((await client.users.getPresence({ user: remindTarget })).presence === 'active') {
       client.chat.postEphemeral({
