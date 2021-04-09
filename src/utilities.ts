@@ -15,3 +15,25 @@ export const getReadableTime = (secondsArg: number) => {
 export const isJson = (e: GoogleAppsScript.Events.DoPost) => {
   return e.postData.type === 'application/json';
 }
+
+export const isUrlVerification = (e: GoogleAppsScript.Events.DoPost) => {
+  if (isJson(e) && e.postData.contents) {
+    return (JSON.parse(e.postData.contents).type === 'url_verification');
+  } else {
+    return false;
+  }
+}
+
+export const isAction = (e: GoogleAppsScript.Events.DoPost) => {
+  // TODO: payload.typeがaction_blocksかinteractive_messageかである必要
+  console.log(typeof(e.parameter))
+  return e.parameter.hasOwnProperty('payload');
+}
+
+export const isEvent = (e: GoogleAppsScript.Events.DoPost)=>{
+  if(e.postData.contents){
+    return JSON.parse(e.postData.contents).hasOwnProperty('event');
+  }else{
+    return false;
+  }
+}

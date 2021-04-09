@@ -1,11 +1,6 @@
 import { SlackAction, BlockAction, ButtonAction } from '@slack/bolt'
 import { join } from './channelState';
 
-export const isAction = (e: GoogleAppsScript.Events.DoPost) => {
-  // TODO: payload.typeがaction_blocksかinteractive_messageかである必要
-  console.log(typeof(e.parameter))
-  return e.parameter.hasOwnProperty('payload');
-}
 
 export const handleSlackAction = (client, payload: SlackAction) => {
   switch (payload.type) {

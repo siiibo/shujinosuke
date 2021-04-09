@@ -1,8 +1,9 @@
 import { SlackEvent } from '@slack/bolt'
-import { isAction, handleSlackAction } from './actionHandler'
+import { handleSlackAction } from './actionHandler'
 import { handleSlackEvent } from './eventHandler'
 import { GasWebClient as SlackClient } from '@hi-se/web-api';
-import {checkParticipants, continueSession, endSession} from './channelState'
+import { checkParticipants, continueSession, endSession } from './channelState'
+import { isAction, isEvent, isJson, isUrlVerification } from './utilities';
 
 export { SlackClient }
 
@@ -22,21 +23,27 @@ export const init = () => {
 
 export const getSlackClient = () => {
   const token = PropertiesService.getScriptProperties().getProperty('SLACK_TOKEN');
-  console.log(`token: ${token}`);
   return new SlackClient(token);
 }
 
+
+
+
 const doPost = (e: GoogleAppsScript.Events.DoPost) => {
-  console.log(e);
+  console.info(`doPost raw event :  ${e}`);
+  if (isUrlVerification(e)) {
+    return ContentService.createTextOutput(JSON.parse(e.postData.contents)['challenge']);
+  }
+
   const client = getSlackClient();
   if (isAction(e)) {
     handleSlackAction(client, JSON.parse(e.parameter['payload']));
-  } else {
+  } else if (isEvent(e)) {
     const event = JSON.parse(e.postData.contents).event as SlackEvent;
-    console.log(event);
     handleSlackEvent(client, event);
   }
-  return ContentService.createTextOutput(e.parameters['challenge']);
+  return ContentService.createTextOutput('OK');
+
 }
 
 declare const global: any;
