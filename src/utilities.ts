@@ -12,3 +12,6 @@ export const getReadableTime = (secondsArg: number) => {
   }
 }
 
+export const isJson = (e: GoogleAppsScript.Events.DoPost) => {
+  return e.postData.type === 'application/json';
+}
