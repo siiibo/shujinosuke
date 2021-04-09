@@ -26,14 +26,14 @@ export const isUrlVerification = (e: GoogleAppsScript.Events.DoPost) => {
 
 export const isAction = (e: GoogleAppsScript.Events.DoPost) => {
   // TODO: payload.typeがaction_blocksかinteractive_messageかである必要
-  console.log(typeof(e.parameter))
+  console.log(typeof (e.parameter))
   return e.parameter.hasOwnProperty('payload');
 }
 
-export const isEvent = (e: GoogleAppsScript.Events.DoPost)=>{
-  if(e.postData.contents){
+export const isEvent = (e: GoogleAppsScript.Events.DoPost) => {
+  if (isJson(e) && e.postData.contents) {
     return JSON.parse(e.postData.contents).hasOwnProperty('event');
-  }else{
+  } else {
     return false;
   }
 }
