@@ -127,7 +127,11 @@ export const join = (client: SlackClient, channelId: string, userId: string) => 
     channelState.waiting.includes(userId) ||
     channelState.done.includes(userId)
   ) {
-    client.chat.postMessage({ channel: channelId, text: '参加済み' });
+    client.chat.postEphemeral({
+      channel: channelId,
+      user: userId,
+      text: '既に参加済みです'
+    });
   } else {
     newChannelState.waiting.push(userId);
     setChannelState(channelId, newChannelState);
