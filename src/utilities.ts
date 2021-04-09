@@ -26,7 +26,6 @@ export const isUrlVerification = (e: GoogleAppsScript.Events.DoPost) => {
 
 export const isAction = (e: GoogleAppsScript.Events.DoPost) => {
   // TODO: payload.typeがaction_blocksかinteractive_messageかである必要
-  console.log(typeof (e.parameter))
   return e.parameter.hasOwnProperty('payload');
 }
 
