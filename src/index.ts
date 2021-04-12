@@ -7,7 +7,7 @@ import { isAction, isEvent, isJson, isUrlVerification } from './utilities';
 
 export { SlackClient }
 
-const TOKEN_SHEET_ID = '1QtAvBmhtClFJJ3nbJz9rsD_Rl3p5WO0q4B9yNuWJ8cA';
+const TOKEN_SHEET_ID = '1ExiQonKpf2T8NnR9YFMzoD7jobHEuAXUUq3vaBL0hW8';
 export const EMOJI_EVENT_POST_CHANNEL = "C011BG29K71" // #雑談
 export const CHECK_TIMEOUT_SECONDS = 1200;
 export const ENDING_PERIOD_SECONDS = 300;
