@@ -52,9 +52,8 @@ Google Apps Script で作成している Slack Bot です。
   - GASへの移行後一時的に同期は解除されている
   - 近日中にGHAを用いて同期処理を実装する予定
 - ローカルでコードを変更した後手動でデプロイ
-  - `yarn run deploypush` を実行　
-    - ビルドからデプロイまで自動で実行される
-    - [package.json](package.json)のconfigに本番環境のデプロイIDが記述されている
+  - `yarn run duildpush` を実行　
+  - `clasp deploy -i <deploymentId>` を実行
 
 ## 補足
 
@@ -67,7 +66,7 @@ Google Apps Script で作成している Slack Bot です。
   - 関連する設定ファイルは
     - [webpack.config.js](webpack.config.js)
     - [tsconfig.json](tsconfig.json)
-- `yarn run deploypush` は以下のことを行っている
+- デプロイまでの流れは以下の通り
   - `webpack` でビルド
   - `clasp push` でコードをGAS環境にpush
   - `clasp deploy -i <deploymentID>` でデプロイの更新
