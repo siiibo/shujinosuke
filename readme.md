@@ -29,6 +29,11 @@ Google Apps Script で作成している Slack Bot です。
   asdf reshim yarn
   yarn
   ```
+- 完全に新しいGASプロジェクトに移行する時は初回のみ以下の操作が必要（更新の場合は不要）
+  - `yarn run buildpush` を実行
+  - GASエディタを開き( `clasp open` )、 `init` 関数を実行する
+    - 初回の実行時はGASに権限付与する必要があるので、画面にしたがって権限を付与する
+    - `init` によってSlackTokenなど必要な情報がGASプロジェクトに登録される
 
 ## 開発
 
