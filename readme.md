@@ -38,7 +38,6 @@ Google Apps Script で作成している Slack Bot です。
   - GASはデプロイの度に新規URLが作成されるので注意
   - コードを更新することが目的の場合は、新規デプロイではなくデプロイを更新する
     - デプロイの更新をするには `clasp deploy -i <deploymentID>` を実行する
-
 - https://api.slack.com/apps/A0108T7KFV0/event-subscriptions からGASでデプロイしたWebAppのURL を設定
   - `https://script.google.com/macros/s/<deploymentID>/exec` のような値
 - https://api.slack.com/apps/A0108T7KFV0/interactive-messages にも同じ値を設定
