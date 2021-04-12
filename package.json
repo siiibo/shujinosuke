@@ -12,8 +12,7 @@
     "build": "npx webpack",
     "buildpush": "npx webpack && clasp push --force",
     "deploypush": "npx webpack && clasp push --force && clasp deploy",
-    "postinstall": "mkdir -p build && cp appsscript.json build/appsscript.json",
-    "start": "nodemon --config .nodemon.json"
+    "postinstall": "mkdir -p build && cp appsscript.json build/appsscript.json"
   },
   "dependencies": {
     "@hi-se/web-api": "https://gitpkg.now.sh/hi-se/node-slack-sdk/packages/web-api?9b8bc580fa3a038f493c235d46cfb99e2af9437d",
