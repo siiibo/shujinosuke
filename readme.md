@@ -77,3 +77,11 @@ Google Apps Script で作成している Slack Bot です。
     - ランタイムやタイムゾーンなど、GAS側で必要な情報の設定
     - ブラウザ上で新規プロジェクトを作成する場合は自動で作成される
       - 初期設定ではオンラインエディタ上に表示されないようになっているが変更することで表示可能
+
+### SlackのWebClientについて
+
+- SlackのWebClientには [@slack/web-api](https://github.com/slackapi/node-slack-sdk)という公式ツールがある
+- しかしGASはNode.jsと完全な互換性はないので上記ツールを利用することができない
+- 上記ツールにはTypeScriptで開発する上で便利な情報が定義されているため、これをGASでも利用できるようにした
+  - リンクは[hi-se/node-slack-sdk](https://github.com/hi-se/node-slack-sdk)
+  - https://gitpkg.now.sh/を利用して `yarn install` している
