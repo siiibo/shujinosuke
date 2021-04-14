@@ -1,8 +1,8 @@
 {
-  "name": "botkit-shujinosuke",
+  "name": "gas-shujinosuke",
   "version": "1.0.0",
   "description": "",
-  "main": "bot.js",
+  "main": "build/backend.js",
   "private": true,
   "engines": {
     "node": "14",
