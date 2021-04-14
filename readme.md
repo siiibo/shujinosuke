@@ -56,7 +56,7 @@ Google Apps Script で作成している Slack Bot です。
   - GASへの移行後一時的に同期は解除されている
   - 近日中にGHAを用いて同期処理を実装する予定
 - ローカルでコードを変更した後手動でデプロイ
-  - `yarn run duildpush` を実行　
+  - `yarn run buildpush` を実行　
   - `clasp deploy -i <deploymentId>` を実行
 
 ## 補足
