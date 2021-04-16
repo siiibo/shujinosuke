@@ -7,6 +7,7 @@ const EMOJI_EVENT_POST_CHANNEL = "C011BG29K71" // #雑談
 const CHECK_TIMEOUT_SECONDS = 1200;
 const ENDING_PERIOD_SECONDS = 300;
 const CALL_REMINDER_SECONDS = 180;
+const LOCK_TIMEOUT_SECONDS = 10;
 
 
 const getReadableTime = (secondsArg: number) => {
@@ -222,16 +223,28 @@ const initChannelState = (channelId: string) => {
 }
 
 const setChannelState = (channelId: string, newState: ChannelState) => {
-  PropertiesService.getScriptProperties().setProperty(channelId, JSON.stringify(newState));
+  const scriptLock = LockService.getScriptLock();
+  if (scriptLock.tryLock(LOCK_TIMEOUT_SECONDS * 1000)) {
+    PropertiesService.getScriptProperties().setProperty(channelId, JSON.stringify(newState));
+    scriptLock.releaseLock();
+  }else{
+    // エラー処理？
+  }
 }
 
 const getChannelState = (channelId: string): ChannelState => {
-  let channelState = JSON.parse(PropertiesService.getScriptProperties().getProperty(channelId));
-  // ↑だけではなぜかstringのままになるのでJSON.parseもう１回（念の為while）
-  while (typeof (channelState) === 'string') {
-    channelState = JSON.parse(channelState);
+  const scriptLock = LockService.getScriptLock();
+  if (scriptLock.tryLock(LOCK_TIMEOUT_SECONDS * 1000)) {
+    let channelState = JSON.parse(PropertiesService.getScriptProperties().getProperty(channelId));
+    // ↑だけではなぜかstringのままになるのでJSON.parseもう１回（念の為while）
+    scriptLock.releaseLock();
+    while (typeof (channelState) === 'string') {
+      channelState = JSON.parse(channelState);
+    }
+    return channelState;
+  }else{
+    return undefined;
   }
-  return channelState;
 }
 
 const deleteChannelState = (channelId: string) => {
