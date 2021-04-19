@@ -7,9 +7,9 @@
   resolved "https://registry.yarnpkg.com/@discoveryjs/json-ext/-/json-ext-0.5.2.tgz#8f03a22a04de437254e8ce8cc84ba39689288752"
   integrity sha512-HyYEUDeIj5rRQU2Hk5HTB2uHsbRQpF70nvMhVzi+VJR0X+xNEhjPui4/kBf3VeH/wqD28PT4sVOm8qqLjBrSZg==
 
-"@hi-se/web-api@https://gitpkg.now.sh/hi-se/node-slack-sdk/packages/web-api?9b8bc580fa3a038f493c235d46cfb99e2af9437d":
+"@hi-se/web-api@https://gitpkg.now.sh/hi-se/node-slack-sdk/packages/web-api?d6102cf8c48b6494d4afc4c01977e5235292c0eb":
   version "6.1.0"
-  resolved "https://gitpkg.now.sh/hi-se/node-slack-sdk/packages/web-api?9b8bc580fa3a038f493c235d46cfb99e2af9437d#43f450a220410cfda8fc3178b0a56cf2467cd68f"
+  resolved "https://gitpkg.now.sh/hi-se/node-slack-sdk/packages/web-api?d6102cf8c48b6494d4afc4c01977e5235292c0eb#0b3d9e69e55e80c1b8f835b98e0402c95c6b2ef3"
   dependencies:
     "@slack/logger" ">=1.0.0 <3.0.0"
     "@slack/types" "^1.7.0"
