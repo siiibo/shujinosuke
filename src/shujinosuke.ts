@@ -45,7 +45,7 @@ interface ChannelState {
 }
 
 
-const initialize = (channelId: string) => {
+const initializeSession = (channelId: string) => {
   setSessionChannelId(channelId);
   initChannelState(channelId);
   ScriptApp.newTrigger(checkParticipants.name)
@@ -58,7 +58,7 @@ const initialize = (channelId: string) => {
     .create();
 }
 
-const terminate = (channelId: string) => {
+const abortSession = (channelId: string) => {
   deleteSessionChannelId();
   deleteChannelState(channelId);
   //TODO: 複数のチャンネルでShujinosukeを運用するのであれば、削除するTriggerを絞る必要がある
@@ -110,7 +110,7 @@ const continueSession = () => {
       )
     })
   } else {
-    terminate(sessionChannelId);
+    abortSession(sessionChannelId);
     client.chat.postMessage({
       channel: sessionChannelId,
       text: `:fast_forward: 終了します。`
@@ -122,7 +122,7 @@ const endSession = () => {
   const client = getSlackClient();
   const sessionChannelId = getSessionChannelId();
   if (getChannelState(sessionChannelId)) {
-    terminate(sessionChannelId);
+    abortSession(sessionChannelId);
     client.chat.postMessage({
       channel: sessionChannelId,
       text: (
@@ -414,7 +414,7 @@ const handleAppMention = (slackClient: SlackClient, appMentionEvent: AppMentionE
 
   listen(/^開始$/, (client, event) => {
     if (!getChannelState(event.channel)) {
-      initialize(event.channel);
+      initializeSession(event.channel);
       const readableCheckTimeout = moment
         .duration(CHECK_TIMEOUT_SECONDS, 'seconds')
         .humanize();
@@ -522,7 +522,7 @@ const handleAppMention = (slackClient: SlackClient, appMentionEvent: AppMentionE
       text: `リセットします。直前の状態は以下のようになっていました\n` +
         getChannelStateMessage(event.channel)
     });
-    terminate(event.channel);
+    abortSession(event.channel);
   });
 
   listen(/(^残りは[？?]?|誰[？?]?$)/, (client, event) => {
