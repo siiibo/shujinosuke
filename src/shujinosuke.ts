@@ -2,6 +2,9 @@ import { SlackEvent, AppMentionEvent, EmojiChangedEvent, GenericMessageEvent } f
 import { SlackAction, BlockAction, ButtonAction } from '@slack/bolt'
 import { GasWebClient as SlackClient } from '@hi-se/web-api';
 
+import moment from 'moment';
+moment.locale('ja');
+
 const TOKEN_SHEET_ID = '1ExiQonKpf2T8NnR9YFMzoD7jobHEuAXUUq3vaBL0hW8';
 const EMOJI_EVENT_POST_CHANNEL = "C011BG29K71" // #雑談
 const CHECK_TIMEOUT_SECONDS = 1200;
@@ -9,20 +12,6 @@ const ENDING_PERIOD_SECONDS = 300;
 const CALL_REMINDER_SECONDS = 180;
 const LOCK_TIMEOUT_SECONDS = 10;
 
-
-const getReadableTime = (secondsArg: number) => {
-  const minutes = Math.floor(secondsArg / 60);
-  const seconds = secondsArg % 60;
-  if (seconds === 0) {
-    return `${Math.floor(secondsArg / 60)}分`;
-  } else {
-    if (minutes === 0) {
-      return `${(secondsArg % 60).toString().padStart(2, '0')}秒`;
-    } else {
-      return `${Math.floor(secondsArg / 60)}分${(secondsArg % 60).toString().padStart(2, '0')}秒`;
-    }
-  }
-}
 
 const isJson = (e: GoogleAppsScript.Events.DoPost) => {
   return e.postData.type === 'application/json';
@@ -152,11 +141,14 @@ const checkAllReported = (client: SlackClient, channelId: string) => {
       .timeBased()
       .after(ENDING_PERIOD_SECONDS * 1000)
       .create();
+    const readableEndingPeriod = moment
+      .duration(ENDING_PERIOD_SECONDS, 'seconds')
+      .humanize();
     client.chat.postMessage({
       channel: channelId,
       text: (
         `:+1: 全員のレポートが完了しました！\n` +
-        `:stopwatch: それでは、${getReadableTime(ENDING_PERIOD_SECONDS)}ほど時間を取りますので、全体連絡のある方はお願いします。\n` +
+        `:stopwatch: それでは、${readableEndingPeriod}ほど時間を取りますので、全体連絡のある方はお願いします。\n` +
         `:eyes: また、この時間で皆さんのレポートを読んでコメントしましょう！（もちろん時間が過ぎたあとも続けて:ok:）`
       )
     })
@@ -423,6 +415,9 @@ const handleAppMention = (slackClient: SlackClient, appMentionEvent: AppMentionE
   listen(/^開始$/, (client, event) => {
     if (!getChannelState(event.channel)) {
       initialize(event.channel);
+      const readableCheckTimeout = moment
+        .duration(CHECK_TIMEOUT_SECONDS, 'seconds')
+        .humanize();
       client.chat.postMessage({
         channel: event.channel,
         blocks: [
@@ -434,7 +429,7 @@ const handleAppMention = (slackClient: SlackClient, appMentionEvent: AppMentionE
                 `:spiral_calendar_pad: 週次定例を始めます！\n` +
                 `:mega: 参加者は「:rocket: 参加」ボタンをクリックか、「 *@Shujinosuke 参加* 」と返信！\n` +
                 `:clipboard: 以下をコピーして書き換えてレポートをまとめ、できたらどんどん投稿しましょう！\n` +
-                `:stopwatch: ${getReadableTime(CHECK_TIMEOUT_SECONDS)}後にリマインドし、全員投稿したら全体連絡の時間に移ります。\n` +
+                `:stopwatch: ${readableCheckTimeout}後にリマインドし、全員投稿したら全体連絡の時間に移ります。\n` +
                 `:question: 私がちゃんと反応しなかった場合、投稿を一度削除して投稿し直してみてください。\n` +
                 `:google: こちらのMeetに参加しておしゃべりもどうぞ！ https://meet.google.com/gsa-wivy-jnu`,
             }
