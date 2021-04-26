@@ -1,6 +1,6 @@
 # Shujinosuke
 
-![](shujinosuke.png)
+![shujinosuke.png](shujinosuke.png)
 
 Google Apps Script で作成している Slack Bot です。
 
@@ -16,6 +16,7 @@ Google Apps Script で作成している Slack Bot です。
 - [ ] 複数チャンネル対応
 - [ ] 設定変更と永続化
 - [ ] GASプロジェクトの保管場所の指定
+
 ## 環境構築
 
 - [clasp](https://github.com/google/clasp)をインストール
@@ -24,11 +25,13 @@ Google Apps Script で作成している Slack Bot です。
 - Shujinosuke の GAS プロジェクトにアクセスできるアカウントで `clasp login`
 - [Shujinoske slack app](https://api.slack.com/apps/A0108T7KFV0/general)のコラボレータに招待してもらう
 - このリポジトリを clone して、以下実行
+
   ```sh
   asdf install
   asdf reshim yarn
   yarn
   ```
+
 - 完全に新しいGASプロジェクトに移行する時は初回のみ以下の操作が必要（更新の場合は不要）
   - `yarn run buildpush` を実行
   - GASエディタを開き( `clasp open` )、 `init` 関数を実行する
@@ -43,9 +46,9 @@ Google Apps Script で作成している Slack Bot です。
   - GASはデプロイの度に新規URLが作成されるので注意
   - コードを更新することが目的の場合は、新規デプロイではなくデプロイを更新する
     - デプロイの更新をするには `clasp deploy -i <deploymentID>` を実行する
-- https://api.slack.com/apps/A0108T7KFV0/event-subscriptions からGASでデプロイしたWebAppのURL を設定
+- `https://api.slack.com/apps/A0108T7KFV0/event-subscriptions` からGASでデプロイしたWebAppのURL を設定
   - `https://script.google.com/macros/s/<deploymentID>/exec` のような値
-- https://api.slack.com/apps/A0108T7KFV0/interactive-messages にも同じ値を設定
+- `https://api.slack.com/apps/A0108T7KFV0/interactive-messages` にも同じ値を設定
 - 適当なテストチャンネルに"Shujinosuke"アプリをインストール、もしくはすでにインストール済みのチャンネルで作業
 - チャンネルで、`@Shujinosuke status`と投稿して疎通確認
 - すでにクラウドにデプロイしたものがある場合、上記開発作業が完了したらデプロイ先ドメインの値に戻す
@@ -56,7 +59,7 @@ Google Apps Script で作成している Slack Bot です。
   - GASへの移行後一時的に同期は解除されている
   - 近日中にGHAを用いて同期処理を実装する予定
 - ローカルでコードを変更した後手動でデプロイ
-  - `yarn run buildpush` を実行　
+  - `yarn run buildpush` を実行
   - `clasp deploy -i <deploymentId>` を実行
 
 ## 補足
@@ -88,4 +91,4 @@ Google Apps Script で作成している Slack Bot です。
 - しかしGASはNode.jsと完全な互換性はないので上記ツールを利用することができない
 - 上記ツールにはTypeScriptで開発する上で便利な情報が定義されているため、これをGASでも利用できるようにした
   - リンクは[hi-se/node-slack-sdk](https://github.com/hi-se/node-slack-sdk)
-  - https://gitpkg.now.sh/を利用して `yarn install` している
+  - `https://gitpkg.now.sh/`を利用して `yarn install` している
