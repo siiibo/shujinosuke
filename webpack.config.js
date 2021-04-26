@@ -4,7 +4,7 @@ const GasPlugin = require("gas-webpack-plugin");
 const mode =
   process.env.NODE_ENV === "development" ? "development" : "production";
 const devtool = "inline-source-map";
-const entry = path.resolve("src", "index.ts");
+const entry = path.resolve("src", "shujinosuke.ts");
 const outPath = path.resolve("build");
 const outFileName = "backend.js";
 const output = {
