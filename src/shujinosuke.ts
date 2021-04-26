@@ -204,18 +204,16 @@ const leave = (client: SlackClient, channelId: string, userId: string) => {
   }
 }
 
-const makeDoneFromWaiting = async (channelId: string, userId: string): Promise<ChannelState | null> => {
-  return new Promise((resolve) => {
-    const channelState = getChannelState(channelId);
-    let newChannelState = { ...channelState };
-    if (!channelState) { resolve(channelState); }
-    newChannelState.done.push(userId);
-    newChannelState.waiting = channelState.waiting.filter((_userId) => {
-      _userId !== userId
-    });
-    setChannelState(channelId, newChannelState);
-    resolve(channelState);
-  })
+const makeDoneFromWaiting = (channelId: string, userId: string): ChannelState | undefined => {
+  const channelState = getChannelState(channelId);
+  let newChannelState = { ...channelState };
+  if (!channelState) { return; }
+  newChannelState.done.push(userId);
+  newChannelState.waiting = channelState.waiting.filter((_userId) => {
+    _userId !== userId
+  });
+  setChannelState(channelId, newChannelState);
+  return newChannelState;
 }
 
 const initChannelState = (channelId: string) => {
@@ -227,7 +225,7 @@ const setChannelState = (channelId: string, newState: ChannelState) => {
   if (scriptLock.tryLock(LOCK_TIMEOUT_SECONDS * 1000)) {
     PropertiesService.getScriptProperties().setProperty(channelId, JSON.stringify(newState));
     scriptLock.releaseLock();
-  }else{
+  } else {
     // エラー処理？
   }
 }
@@ -242,7 +240,7 @@ const getChannelState = (channelId: string): ChannelState => {
       channelState = JSON.parse(channelState);
     }
     return channelState;
-  }else{
+  } else {
     return undefined;
   }
 }
@@ -477,7 +475,7 @@ const handleAppMention = (slackClient: SlackClient, appMentionEvent: AppMentionE
   });
 
   listen(/^レポート|調子、出来事、悩み等/, async (client, event) => {
-    const channelState = await makeDoneFromWaiting(event.channel, event.user);
+    const channelState = makeDoneFromWaiting(event.channel, event.user);
     if (channelState) {
       client.chat.postMessage({
         channel: event.channel,
