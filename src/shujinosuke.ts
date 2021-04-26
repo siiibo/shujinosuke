@@ -65,7 +65,6 @@ const abortSession = (channelId: string) => {
   ScriptApp.getProjectTriggers().forEach(trigger => {
     ScriptApp.deleteTrigger(trigger);
   });
-  deleteSessionChannelId();
 }
 
 const checkParticipants = async () => {
