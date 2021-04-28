@@ -225,11 +225,7 @@ const getChannelState = (channelId: string): ChannelState => {
   const scriptLock = LockService.getScriptLock();
   if (scriptLock.tryLock(LOCK_TIMEOUT_SECONDS * 1000)) {
     let channelState = JSON.parse(PropertiesService.getScriptProperties().getProperty(channelId));
-    // ↑だけではなぜかstringのままになるのでJSON.parseもう１回（念の為while）
     scriptLock.releaseLock();
-    while (typeof (channelState) === 'string') {
-      channelState = JSON.parse(channelState);
-    }
     return channelState;
   } else {
     return undefined;
