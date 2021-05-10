@@ -156,55 +156,78 @@ const checkAllReported = (client: SlackClient, channelId: string) => {
 
 
 const join = (client: SlackClient, channelId: string, userId: string) => {
-  const channelState = getChannelState(channelId);
-  let newChannelState = { ...channelState };
-  if (!channelState) {
-    client.chat.postMessage({ channel: channelId, text: 'no channel state' });
-    return;
-  }
-  if (
-    channelState.waiting.includes(userId) ||
-    channelState.done.includes(userId)
-  ) {
-    client.chat.postEphemeral({
-      channel: channelId,
-      user: userId,
-      text: '既に参加済みです'
-    });
-  } else {
-    newChannelState.waiting.push(userId);
-    setChannelState(channelId, newChannelState);
-    client.chat.postMessage({ channel: channelId, text: `:hand: <@${userId}> が参加しました` });
+  const scriptLock = LockService.getScriptLock();
+  try {
+    scriptLock.waitLock(LOCK_TIMEOUT_SECONDS * 1000)
+    const channelState = getChannelState(channelId);
+    let newChannelState = { ...channelState };
+    if (!channelState) {
+      client.chat.postMessage({ channel: channelId, text: 'no channel state' });
+      return;
+    }
+    if (
+      channelState.waiting.includes(userId) ||
+      channelState.done.includes(userId)
+    ) {
+      client.chat.postEphemeral({
+        channel: channelId,
+        user: userId,
+        text: '既に参加済みです'
+      });
+    } else {
+      newChannelState.waiting.push(userId);
+      setChannelState(channelId, newChannelState);
+      client.chat.postMessage({ channel: channelId, text: `:hand: <@${userId}> が参加しました` });
+    }
+
+  } catch (e) {
+    console.error(e);
+  } finally {
+    scriptLock.releaseLock();
   }
 }
 
 const leave = (client: SlackClient, channelId: string, userId: string) => {
-  const channelState: ChannelState = getChannelState(channelId);
-  let newChannelState: ChannelState = { ...channelState }
-  if (!channelState) {
-    client.chat.postMessage({ channel: channelId, text: 'no channel state' });
-    return;
-  }
-  if (channelState.waiting.includes(userId)) {
-    newChannelState.waiting = channelState.waiting.filter((_userId) => {
-      return _userId !== userId
-    });
-    setChannelState(channelId, newChannelState);
-    client.chat.postMessage({ channel: channelId, text: `:wave: <@${userId}> がキャンセルしました` });
-    checkAllReported(client, channelId);
+  const scriptLock = LockService.getScriptLock();
+  try {
+    const channelState: ChannelState = getChannelState(channelId);
+    let newChannelState: ChannelState = { ...channelState }
+    if (!channelState) {
+      client.chat.postMessage({ channel: channelId, text: 'no channel state' });
+      return;
+    }
+    if (channelState.waiting.includes(userId)) {
+      newChannelState.waiting = channelState.waiting.filter((_userId) => {
+        return _userId !== userId
+      });
+      setChannelState(channelId, newChannelState);
+      client.chat.postMessage({ channel: channelId, text: `:wave: <@${userId}> がキャンセルしました` });
+      checkAllReported(client, channelId);
+    }
+  } catch (e) {
+    console.error(e);
+  } finally {
+    scriptLock.releaseLock();
   }
 }
 
 const makeDoneFromWaiting = (channelId: string, userId: string): ChannelState | undefined => {
-  const channelState = getChannelState(channelId);
-  let newChannelState = { ...channelState };
-  if (!channelState) { return; }
-  newChannelState.done.push(userId);
-  newChannelState.waiting = channelState.waiting.filter((_userId) => {
-    _userId !== userId
-  });
-  setChannelState(channelId, newChannelState);
-  return newChannelState;
+  const scriptLock = LockService.getScriptLock();
+  try {
+    const channelState = getChannelState(channelId);
+    let newChannelState = { ...channelState };
+    if (!channelState) { return; }
+    newChannelState.done.push(userId);
+    newChannelState.waiting = channelState.waiting.filter((_userId) => {
+      _userId !== userId
+    });
+    setChannelState(channelId, newChannelState);
+    return newChannelState;
+  } catch (e) {
+    console.error(e);
+  } finally {
+    scriptLock.releaseLock();
+  }
 }
 
 const initChannelState = (channelId: string) => {
@@ -212,24 +235,12 @@ const initChannelState = (channelId: string) => {
 }
 
 const setChannelState = (channelId: string, newState: ChannelState) => {
-  const scriptLock = LockService.getScriptLock();
-  if (scriptLock.tryLock(LOCK_TIMEOUT_SECONDS * 1000)) {
-    PropertiesService.getScriptProperties().setProperty(channelId, JSON.stringify(newState));
-    scriptLock.releaseLock();
-  } else {
-    // エラー処理？
-  }
+  PropertiesService.getScriptProperties().setProperty(channelId, JSON.stringify(newState));
 }
 
 const getChannelState = (channelId: string): ChannelState => {
-  const scriptLock = LockService.getScriptLock();
-  if (scriptLock.tryLock(LOCK_TIMEOUT_SECONDS * 1000)) {
-    let channelState = JSON.parse(PropertiesService.getScriptProperties().getProperty(channelId));
-    scriptLock.releaseLock();
-    return channelState;
-  } else {
-    return undefined;
-  }
+  let channelState = JSON.parse(PropertiesService.getScriptProperties().getProperty(channelId));
+  return channelState;
 }
 
 const deleteChannelState = (channelId: string) => {
