@@ -219,7 +219,7 @@ const makeDoneFromWaiting = (channelId: string, userId: string): ChannelState | 
     if (!channelState) { return; }
     newChannelState.done.push(userId);
     newChannelState.waiting = channelState.waiting.filter((_userId) => {
-      _userId !== userId
+      return _userId !== userId
     });
     setChannelState(channelId, newChannelState);
     return newChannelState;
