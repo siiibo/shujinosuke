@@ -194,15 +194,8 @@ const leave = (client: SlackClient, channelId: string, userId: string) => {
   }
 }
 
-const makeDoneFromWaiting = (channelId: string, userId: string): ChannelState | undefined => {
-  const channelState = getChannelState(channelId);
-  let newChannelState = { ...channelState };
-  if (!channelState) { return; }
-  newChannelState.done.push(userId);
-  newChannelState.waiting = channelState.waiting.filter((_userId) => {
-    return _userId !== userId
-  });
-  return newChannelState;
+const makeDoneFromWaiting = (channelId: string, userId: string): void => {
+  setSessionUserState(channelId, userId, 'done');
 }
 
 const getChannelState = (channelId: string): ChannelState => {
@@ -445,18 +438,16 @@ const handleAppMention = (slackClient: SlackClient, appMentionEvent: AppMentionE
   });
 
   listen(/^レポート|調子、出来事、悩み等/, async (client, event) => {
-    const channelState = makeDoneFromWaiting(event.channel, event.user);
-    if (channelState) {
-      client.chat.postMessage({
-        channel: event.channel,
-        thread_ts: getThreadTs(event),
-        text: `` +
-          `:+1: ありがとうございます！\n` +
-          `:pencil: 皆さんコメントや質問をどうぞ！\n` +
-          `(チャンネルを読みやすく保つため、「以下にも投稿する：<#${event.channel}>」は使わないようにお願いします)`
-      });
-      checkAllReported(client, event.channel);
-    }
+    makeDoneFromWaiting(event.channel, event.user);
+    client.chat.postMessage({
+      channel: event.channel,
+      thread_ts: getThreadTs(event),
+      text: `` +
+        `:+1: ありがとうございます！\n` +
+        `:pencil: 皆さんコメントや質問をどうぞ！\n` +
+        `(チャンネルを読みやすく保つため、「以下にも投稿する：<#${event.channel}>」は使わないようにお願いします)`
+    });
+    checkAllReported(client, event.channel);
   });
 
   listen(/参加/, (client, event) => {
