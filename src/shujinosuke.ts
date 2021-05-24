@@ -201,13 +201,13 @@ const makeDoneFromWaiting = (channelId: string, userId: string): void => {
 
 const getChannelState = (channelId: string): ChannelState => {
   const properties = PropertiesService.getScriptProperties().getProperties();
-  const users = Object.entries(properties).filter(([key, value]) => {
+  const participants = Object.entries(properties).filter(([key, value]) => {
     return value.includes(channelId);
   });
-  const waiting = users.filter(([_, value]) => {
+  const waiting = participants.filter(([_, value]) => {
     return value.includes('waiting');
   }).map(([key, _]) => { return key });
-  const done = users.filter(([_, value]) => {
+  const done = participants.filter(([_, value]) => {
     return value.includes('done');
   }).map(([key, _]) => { return key });
   return {
