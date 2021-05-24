@@ -66,6 +66,7 @@ const initializeSession = (channelId: string) => {
 
 const abortSession = (channelId: string) => {
   deleteSessionChannelId();
+  deleteChannelState(channelId);
   //TODO: 複数のチャンネルでShujinosukeを運用するのであれば、削除するTriggerを絞る必要がある
   ScriptApp.getProjectTriggers().forEach(trigger => {
     ScriptApp.deleteTrigger(trigger);
@@ -213,6 +214,16 @@ const getChannelState = (channelId: string): ChannelState => {
     waiting: waiting,
     done: done
   };
+}
+
+const deleteChannelState = (channelId: string): void => {
+  const properties = PropertiesService.getScriptProperties().getProperties();
+  const participants = Object.entries(properties).filter(([key, value]) => {
+    return value.includes(channelId);
+  });
+  participants.forEach(([key, _]) => {
+    PropertiesService.getScriptProperties().deleteProperty(key);
+  })
 }
 
 const getSessionChannelId = () => {
