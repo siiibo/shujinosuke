@@ -60,7 +60,7 @@ const initializeSession = (channelId: string) => {
     .timeBased()
     .after(CALL_REMINDER_SECONDS * 1000)
     .create();
-  ScriptApp.newTrigger(continueSession.name)
+  ScriptApp.newTrigger(sendReminderForEndSession.name)
     .timeBased()
     .after(CHECK_TIMEOUT_SECONDS * 1000)
     .create();
@@ -111,7 +111,7 @@ const sendReminderForJoin = async () => {
 }
 
 
-const continueSession = () => {
+const sendReminderForEndSession = () => {
   const scriptLock = LockService.getScriptLock();
   try {
     scriptLock.waitLock(LOCK_TIMEOUT_SECONDS * 1000);
@@ -581,6 +581,6 @@ const handleEmojiChange = (client: SlackClient, event: EmojiChangedEvent) => {
 declare const global: any;
 global.doPost = doPost;
 global.init = init;
-global.continueSession = continueSession;
+global.continueSession = sendReminderForEndSession;
 global.checkParticipants = sendReminderForJoin;
 global.endSession = endSession;
