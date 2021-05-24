@@ -44,6 +44,15 @@ interface ChannelState {
   done: string[]
 }
 
+type SessionUserState = 'waiting' | 'done';
+
+const setSessionUserState = (channelId: string, userId: string, userState: SessionUserState) => {
+  PropertiesService.getScriptProperties().setProperty(userId, `${channelId}-${userState}`);
+}
+
+const deleteSessionUserState = (userId: string) => {
+  PropertiesService.getScriptProperties().deleteProperty(userId);
+}
 
 const initializeSession = (channelId: string) => {
   setSessionChannelId(channelId);
