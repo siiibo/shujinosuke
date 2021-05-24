@@ -56,7 +56,7 @@ const deleteSessionUserState = (userId: string) => {
 
 const initializeSession = (channelId: string) => {
   setSessionChannelId(channelId);
-  ScriptApp.newTrigger(checkParticipants.name)
+  ScriptApp.newTrigger(sendReminderForJoin.name)
     .timeBased()
     .after(CALL_REMINDER_SECONDS * 1000)
     .create();
@@ -74,7 +74,7 @@ const abortSession = (channelId: string) => {
   });
 }
 
-const checkParticipants = async () => {
+const sendReminderForJoin = async () => {
   const exceptions = ["U010MMQGD96", "UU8H6MKEU"]; //Shujinosuke and observers
   const client = getSlackClient();
   const scriptLock = LockService.getScriptLock();
@@ -563,7 +563,7 @@ const handleAppMention = (slackClient: SlackClient, appMentionEvent: AppMentionE
       channel: event.channel,
       text: 'check'
     })
-    checkParticipants();
+    sendReminderForJoin();
   })
 }
 
@@ -582,5 +582,5 @@ declare const global: any;
 global.doPost = doPost;
 global.init = init;
 global.continueSession = continueSession;
-global.checkParticipants = checkParticipants;
+global.checkParticipants = sendReminderForJoin;
 global.endSession = endSession;
