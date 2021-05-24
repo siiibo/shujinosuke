@@ -10,8 +10,6 @@ const EMOJI_EVENT_POST_CHANNEL = "C011BG29K71" // #雑談
 const CHECK_TIMEOUT_SECONDS = 1200;
 const ENDING_PERIOD_SECONDS = 300;
 const CALL_REMINDER_SECONDS = 180;
-const LOCK_TIMEOUT_SECONDS = 10;
-
 
 const isJson = (e: GoogleAppsScript.Events.DoPost) => {
   return e.postData.type === 'application/json';
@@ -77,89 +75,65 @@ const abortSession = (channelId: string) => {
 const sendReminderForJoin = async () => {
   const exceptions = ["U010MMQGD96", "UU8H6MKEU"]; //Shujinosuke and observers
   const client = getSlackClient();
-  const scriptLock = LockService.getScriptLock();
-  try {
-    scriptLock.waitLock(LOCK_TIMEOUT_SECONDS * 1000);
-    const sessionChannelId = getSessionChannelId();
-    const channelState = getChannelState(sessionChannelId);
-    const channelMembers = (await client.conversations.members({
-      channel: sessionChannelId
-    })).members.filter(userId => !exceptions.includes(userId));
-    const remindTargets = channelMembers.filter(userId => {
-      return (
-        !channelState.done.includes(userId) &&
-        !channelState.waiting.includes(userId)
-      )
-    });
-    remindTargets.forEach(async (remindTarget) => {
-      if ((await client.users.getPresence({ user: remindTarget })).presence === 'active') {
-        client.chat.postEphemeral({
-          channel: sessionChannelId,
-          user: remindTarget,
-          text: (
-            `:white_check_mark: <@${remindTarget}>さん、今週の週次が始まっています！` +
-            `:old_key: 参加する場合は 「参加」ボタンをクリックか、 \`@Shujinosuke 参加\` と発言してください！`
-          )
-        })
-      }
-    });
-  } catch (e) {
-    console.error(e);
-  } finally {
-    scriptLock.releaseLock();
-  }
+  const sessionChannelId = getSessionChannelId();
+  const channelState = getChannelState(sessionChannelId);
+  const channelMembers = (await client.conversations.members({
+    channel: sessionChannelId
+  })).members.filter(userId => !exceptions.includes(userId));
+  const remindTargets = channelMembers.filter(userId => {
+    return (
+      !channelState.done.includes(userId) &&
+      !channelState.waiting.includes(userId)
+    )
+  });
+  remindTargets.forEach(async (remindTarget) => {
+    if ((await client.users.getPresence({ user: remindTarget })).presence === 'active') {
+      client.chat.postEphemeral({
+        channel: sessionChannelId,
+        user: remindTarget,
+        text: (
+          `:white_check_mark: <@${remindTarget}>さん、今週の週次が始まっています！` +
+          `:old_key: 参加する場合は 「参加」ボタンをクリックか、 \`@Shujinosuke 参加\` と発言してください！`
+        )
+      })
+    }
+  });
 }
 
 
 const sendReminderForEndSession = () => {
-  const scriptLock = LockService.getScriptLock();
-  try {
-    scriptLock.waitLock(LOCK_TIMEOUT_SECONDS * 1000);
-    const client = getSlackClient();
-    const sessionChannelId = getSessionChannelId();
-    const channelState = getChannelState(sessionChannelId);
-    if (channelState?.waiting.length) {
-      client.chat.postMessage({
-        channel: sessionChannelId,
-        text: (
-          `:stopwatch: あと${channelState.waiting.length}人です。全体連絡を先に始めていてもOKです。\n` +
-          `:question: 私がちゃんと反応しなかった場合、削除して投稿し直してみてください。`
-        )
-      })
-    } else {
-      abortSession(sessionChannelId);
-      client.chat.postMessage({
-        channel: sessionChannelId,
-        text: `:fast_forward: 終了します。`
-      })
-    }
-  } catch (e) {
-    console.error(e);
-  } finally {
-    scriptLock.releaseLock();
+  const client = getSlackClient();
+  const sessionChannelId = getSessionChannelId();
+  const channelState = getChannelState(sessionChannelId);
+  if (channelState?.waiting.length) {
+    client.chat.postMessage({
+      channel: sessionChannelId,
+      text: (
+        `:stopwatch: あと${channelState.waiting.length}人です。全体連絡を先に始めていてもOKです。\n` +
+        `:question: 私がちゃんと反応しなかった場合、削除して投稿し直してみてください。`
+      )
+    })
+  } else {
+    abortSession(sessionChannelId);
+    client.chat.postMessage({
+      channel: sessionChannelId,
+      text: `:fast_forward: 終了します。`
+    })
   }
 }
 
 const endSession = () => {
-  const scriptLock = LockService.getScriptLock();
-  try {
-    scriptLock.waitLock(LOCK_TIMEOUT_SECONDS * 1000);
-    const client = getSlackClient();
-    const sessionChannelId = getSessionChannelId();
-    if (getChannelState(sessionChannelId)) {
-      abortSession(sessionChannelId);
-      client.chat.postMessage({
-        channel: sessionChannelId,
-        text: (
-          `:stopwatch: 時間になりました！ みなさんご協力ありがとうございました。 :bow:\n` +
-          `:rainbow: リフレッシュして、業務に戻りましょう！ :notes:`
-        )
-      });
-    }
-  } catch (e) {
-    console.error(e);
-  } finally {
-    scriptLock.releaseLock();
+  const client = getSlackClient();
+  const sessionChannelId = getSessionChannelId();
+  if (getChannelState(sessionChannelId)) {
+    abortSession(sessionChannelId);
+    client.chat.postMessage({
+      channel: sessionChannelId,
+      text: (
+        `:stopwatch: 時間になりました！ みなさんご協力ありがとうございました。 :bow:\n` +
+        `:rainbow: リフレッシュして、業務に戻りましょう！ :notes:`
+      )
+    });
   }
 }
 
@@ -290,21 +264,13 @@ const doPost = (e: GoogleAppsScript.Events.DoPost) => {
   }
 
   const client = getSlackClient();
-  const scriptLock = LockService.getScriptLock();
-  try {
-    scriptLock.waitLock(LOCK_TIMEOUT_SECONDS * 1000);
-    if (isAction(e)) {
-      handleSlackAction(client, JSON.parse(e.parameter['payload']));
-    } else if (isEvent(e)) {
-      const event = JSON.parse(e.postData.contents).event as SlackEvent;
-      handleSlackEvent(client, event);
-    }
-  } catch (e) {
-    console.error(e);
-  } finally {
-    scriptLock.releaseLock();
-    return ContentService.createTextOutput('OK');
+  if (isAction(e)) {
+    handleSlackAction(client, JSON.parse(e.parameter['payload']));
+  } else if (isEvent(e)) {
+    const event = JSON.parse(e.postData.contents).event as SlackEvent;
+    handleSlackEvent(client, event);
   }
+  return ContentService.createTextOutput('OK');
 }
 
 const handleSlackAction = (client, payload: SlackAction) => {
