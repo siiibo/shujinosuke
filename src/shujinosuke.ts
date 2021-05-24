@@ -47,7 +47,6 @@ interface ChannelState {
 
 const initializeSession = (channelId: string) => {
   setSessionChannelId(channelId);
-  initChannelState(channelId);
   ScriptApp.newTrigger(checkParticipants.name)
     .timeBased()
     .after(CALL_REMINDER_SECONDS * 1000)
@@ -197,7 +196,6 @@ const join = (client: SlackClient, channelId: string, userId: string) => {
     });
   } else {
     newChannelState.waiting.push(userId);
-    setChannelState(channelId, newChannelState);
     client.chat.postMessage({ channel: channelId, text: `:hand: <@${userId}> が参加しました` });
   }
 }
@@ -213,7 +211,6 @@ const leave = (client: SlackClient, channelId: string, userId: string) => {
     newChannelState.waiting = channelState.waiting.filter((_userId) => {
       return _userId !== userId
     });
-    setChannelState(channelId, newChannelState);
     client.chat.postMessage({ channel: channelId, text: `:wave: <@${userId}> がキャンセルしました` });
     checkAllReported(client, channelId);
   }
@@ -227,16 +224,7 @@ const makeDoneFromWaiting = (channelId: string, userId: string): ChannelState | 
   newChannelState.waiting = channelState.waiting.filter((_userId) => {
     return _userId !== userId
   });
-  setChannelState(channelId, newChannelState);
   return newChannelState;
-}
-
-const initChannelState = (channelId: string) => {
-  setChannelState(channelId, { waiting: [], done: [] });
-}
-
-const setChannelState = (channelId: string, newState: ChannelState) => {
-  PropertiesService.getScriptProperties().setProperty(channelId, JSON.stringify(newState));
 }
 
 const getChannelState = (channelId: string): ChannelState => {
