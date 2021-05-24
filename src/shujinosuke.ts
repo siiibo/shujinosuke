@@ -240,8 +240,20 @@ const setChannelState = (channelId: string, newState: ChannelState) => {
 }
 
 const getChannelState = (channelId: string): ChannelState => {
-  let channelState = JSON.parse(PropertiesService.getScriptProperties().getProperty(channelId));
-  return channelState;
+  const properties = PropertiesService.getScriptProperties().getProperties();
+  const users = Object.entries(properties).filter(([key, value]) => {
+    return value.includes(channelId);
+  });
+  const waiting = users.filter(([_, value]) => {
+    return value.includes('waiting');
+  }).map(([key, _]) => { return key });
+  const done = users.filter(([_, value]) => {
+    return value.includes('done');
+  }).map(([key, _]) => { return key });
+  return {
+    waiting: waiting,
+    done: done
+  };
 }
 
 const deleteChannelState = (channelId: string) => {
