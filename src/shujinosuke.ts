@@ -162,7 +162,6 @@ const checkAllReported = (client: SlackClient, channelId: string) => {
 
 const join = (client: SlackClient, channelId: string, userId: string) => {
   const channelState = getChannelState(channelId);
-  let newChannelState = { ...channelState };
   if (!channelState) {
     client.chat.postMessage({ channel: channelId, text: 'no channel state' });
     return;
@@ -177,22 +176,19 @@ const join = (client: SlackClient, channelId: string, userId: string) => {
       text: '既に参加済みです'
     });
   } else {
-    newChannelState.waiting.push(userId);
+    setSessionUserState(channelId, userId, 'waiting');
     client.chat.postMessage({ channel: channelId, text: `:hand: <@${userId}> が参加しました` });
   }
 }
 
 const leave = (client: SlackClient, channelId: string, userId: string) => {
   const channelState: ChannelState = getChannelState(channelId);
-  let newChannelState: ChannelState = { ...channelState }
   if (!channelState) {
     client.chat.postMessage({ channel: channelId, text: 'no channel state' });
     return;
   }
   if (channelState.waiting.includes(userId)) {
-    newChannelState.waiting = channelState.waiting.filter((_userId) => {
-      return _userId !== userId
-    });
+    deleteSessionUserState(userId);
     client.chat.postMessage({ channel: channelId, text: `:wave: <@${userId}> がキャンセルしました` });
     checkAllReported(client, channelId);
   }
