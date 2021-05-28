@@ -410,7 +410,7 @@ const handleAppMention = (slackClient: SlackClient, appMentionEvent: AppMentionE
                 `:clipboard: 以下をコピーして書き換えてレポートをまとめ、できたらどんどん投稿しましょう！\n` +
                 `:stopwatch: ${readableCheckTimeout}後にリマインドし、全員投稿したら全体連絡の時間に移ります。\n` +
                 `:question: 私がちゃんと反応しなかった場合、投稿を一度削除して投稿し直してみてください。\n` +
-                `:google: こちらのMeetに参加しておしゃべりもどうぞ！ https://meet.google.com/gsa-wivy-jnu`,
+                `:google: こちらのMeetに参加しておしゃべりもどうぞ！ https://meet.google.com/ofo-ykna-amj`,
             }
           },
           {
