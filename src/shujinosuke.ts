@@ -392,7 +392,7 @@ const handleAppMention = (slackClient: SlackClient, appMentionEvent: AppMentionE
   const listen = getListen(slackClient, appMentionEvent);
 
   listen(/^開始$/, (client, event) => {
-    if (!getChannelState(event.channel)) {
+    if (!getChannelState(event.channel).done.length) {
       initializeSession(event.channel);
       const readableCheckTimeout = moment
         .duration(CHECK_TIMEOUT_SECONDS, 'seconds')
