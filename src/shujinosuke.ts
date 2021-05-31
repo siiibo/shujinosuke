@@ -449,6 +449,9 @@ const handleAppMention = (slackClient: SlackClient, appMentionEvent: AppMentionE
   });
 
   listen(/^レポート|調子、出来事、悩み等/, async (client, event) => {
+    if (getChannelState(event.channel).done.includes(event.user)) {
+      return;
+    }
     makeDoneFromWaiting(event.channel, event.user);
     client.chat.postMessage({
       channel: event.channel,
