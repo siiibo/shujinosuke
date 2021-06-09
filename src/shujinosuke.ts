@@ -550,6 +550,6 @@ const handleEmojiChange = (client: SlackClient, event: EmojiChangedEvent) => {
 declare const global: any;
 global.doPost = doPost;
 global.init = init;
-global.continueSession = sendReminderForEndSession;
-global.checkParticipants = sendReminderForJoin;
+global.sendReminderForEndSession = sendReminderForEndSession;
+global.sendReminderForJoin = sendReminderForJoin;
 global.endSession = endSession;
