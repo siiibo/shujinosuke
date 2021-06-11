@@ -7,6 +7,7 @@ moment.locale('ja');
 
 const TOKEN_SHEET_ID = '1ExiQonKpf2T8NnR9YFMzoD7jobHEuAXUUq3vaBL0hW8';
 const EMOJI_EVENT_POST_CHANNEL = "C011BG29K71" // #雑談
+const CHANNEL_EVENT_POST_CHANNEL = "C011BG29K71"; // #雑談
 const CHECK_TIMEOUT_SECONDS = 1200;
 const ENDING_PERIOD_SECONDS = 300;
 const CALL_REMINDER_SECONDS = 180;
@@ -552,7 +553,7 @@ const handleEmojiChange = (client: SlackClient, event: EmojiChangedEvent) => {
 
 const handleChannelCreated = (client: SlackClient, event: ChannelCreatedEvent)=>{
   client.chat.postMessage({
-    channel: EMOJI_EVENT_POST_CHANNEL,
+    channel: CHANNEL_EVENT_POST_CHANNEL,
     text: `<#${event.channel.id}>が追加されました！`
   });
 }
