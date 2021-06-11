@@ -1,4 +1,4 @@
-import { SlackEvent, AppMentionEvent, EmojiChangedEvent, GenericMessageEvent } from '@slack/bolt'
+import { SlackEvent, AppMentionEvent, EmojiChangedEvent, GenericMessageEvent, ChannelCreatedEvent } from '@slack/bolt'
 import { SlackAction, BlockAction, ButtonAction } from '@slack/bolt'
 import { GasWebClient as SlackClient } from '@hi-se/web-api';
 
@@ -377,6 +377,10 @@ const handleSlackEvent = (client: SlackClient, event: SlackEvent) => {
       break;
     case 'emoji_changed':
       handleEmojiChange(client, event as EmojiChangedEvent);
+      break;
+    case 'channel_created':
+      handleChannelCreated(client, event as ChannelCreatedEvent);
+      break;
   }
 }
 
@@ -546,6 +550,12 @@ const handleEmojiChange = (client: SlackClient, event: EmojiChangedEvent) => {
   }
 }
 
+const handleChannelCreated = (client: SlackClient, event: ChannelCreatedEvent)=>{
+  client.chat.postMessage({
+    channel: EMOJI_EVENT_POST_CHANNEL,
+    text: `<#${event.channel.id}>が追加されました！`
+  });
+}
 
 declare const global: any;
 global.doPost = doPost;
