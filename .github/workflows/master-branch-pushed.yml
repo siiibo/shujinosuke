@@ -65,7 +65,8 @@ jobs:
         run: |
           echo $(cat <<-EOS
           {
-            "scriptId": "${SCRIPT_ID}"
+            "scriptId": "${SCRIPT_ID}",
+            "rootDir": "build"
           }
           EOS
           ) > ~/.clasp.json
