@@ -36,8 +36,7 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-yarn-
       - name: yarn install
-        if: steps.yarn-cache.outputs.cache-hit != 'true'
-        run: yarn install
+        run: yarn install --prefer-offline
       - name: Install Clasp
         run: npm install -g @google/clasp
       - name: Create ~/.clasprc.json
