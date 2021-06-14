@@ -38,7 +38,7 @@ jobs:
       - name: yarn install
         run: yarn install --prefer-offline
       - name: Install Clasp
-        run: yarn global add @google/clasp --prefer-offline
+        run: yarn global add @google/clasp
       - name: Create ~/.clasprc.json
         run: |
           echo $(cat <<-EOS
