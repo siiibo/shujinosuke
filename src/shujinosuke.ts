@@ -1,4 +1,4 @@
-import { SlackEvent, AppMentionEvent, EmojiChangedEvent, GenericMessageEvent } from '@slack/bolt'
+import { SlackEvent, AppMentionEvent, EmojiChangedEvent, GenericMessageEvent, ChannelCreatedEvent } from '@slack/bolt'
 import { SlackAction, BlockAction, ButtonAction } from '@slack/bolt'
 import { GasWebClient as SlackClient } from '@hi-se/web-api';
 
@@ -7,6 +7,7 @@ moment.locale('ja');
 
 const TOKEN_SHEET_ID = '1ExiQonKpf2T8NnR9YFMzoD7jobHEuAXUUq3vaBL0hW8';
 const EMOJI_EVENT_POST_CHANNEL = "C011BG29K71" // #雑談
+const CHANNEL_EVENT_POST_CHANNEL = "C011BG29K71"; // #雑談
 const CHECK_TIMEOUT_SECONDS = 1200;
 const ENDING_PERIOD_SECONDS = 300;
 const CALL_REMINDER_SECONDS = 180;
@@ -377,6 +378,10 @@ const handleSlackEvent = (client: SlackClient, event: SlackEvent) => {
       break;
     case 'emoji_changed':
       handleEmojiChange(client, event as EmojiChangedEvent);
+      break;
+    case 'channel_created':
+      handleChannelCreated(client, event as ChannelCreatedEvent);
+      break;
   }
 }
 
@@ -546,10 +551,16 @@ const handleEmojiChange = (client: SlackClient, event: EmojiChangedEvent) => {
   }
 }
 
+const handleChannelCreated = (client: SlackClient, event: ChannelCreatedEvent)=>{
+  client.chat.postMessage({
+    channel: CHANNEL_EVENT_POST_CHANNEL,
+    text: `<#${event.channel.id}>が追加されました！`
+  });
+}
 
 declare const global: any;
 global.doPost = doPost;
 global.init = init;
-global.continueSession = sendReminderForEndSession;
-global.checkParticipants = sendReminderForJoin;
+global.sendReminderForEndSession = sendReminderForEndSession;
+global.sendReminderForJoin = sendReminderForJoin;
 global.endSession = endSession;
