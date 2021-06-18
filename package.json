@@ -19,6 +19,7 @@
     "moment": "^2.29.1"
   },
   "devDependencies": {
+    "@google/clasp": "^2.3.2",
     "@types/google-apps-script": "^1.0.29",
     "gas-webpack-plugin": "^2.0.0",
     "ts-loader": "^8.0.18",
