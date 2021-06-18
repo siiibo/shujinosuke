@@ -71,7 +71,7 @@ jobs:
         run: npx webpack
       - name: Push
         run: |
-          clasp push --force
+          yarn clasp push --force
       - name: Deploy
         run: |
-          clasp deploy -i $DEPLOYMENT_ID
+          yarn clasp deploy -i $DEPLOYMENT_ID
