@@ -2,8 +2,10 @@ name: Master
 
 on:
   push:
-  # paths:
-  # - "src/"
+    branches:
+      - "master"
+    paths-ignore:
+      - "**.md"
   workflow_dispatch:
 
 jobs:
