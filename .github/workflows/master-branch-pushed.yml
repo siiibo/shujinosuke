@@ -63,4 +63,4 @@ jobs:
           yarn clasp push --force
       - name: Deploy
         run: |
-          yarn clasp deploy -i $DEPLOYMENT_ID
+          yarn clasp deploy -i ${{ secrets.DEPLOYMENT_ID }}
