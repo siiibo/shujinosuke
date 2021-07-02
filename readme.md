@@ -43,16 +43,16 @@ Google Apps Script で作成している Slack Bot です。
 - 設定する値は以下の通り
   - claspの設定は `cat ~/.clasprc.json| jq` などを実行すれば出てくる（Macの場合）
 
-| KEY | 説明|
-|----|----|
-|ACCESS_TOKEN | claspの設定 |
-|CLIENT_ID|claspの設定 |
-|CLIENT_SECRET|claspの設定|
-|DEPLOYMENT_ID|claspの設定|
-|EXPIRY_DATE|claspの設定|
-|ID_TOKEN|claspの設定|
-|REFRESH_TOKEN|claspの設定|
-|SCRIPT_ID|GASプロジェクトのスクリプトID|
+| KEY           | 説明                          |
+| ------------- | ----------------------------- |
+| ACCESS_TOKEN  | claspの設定                   |
+| CLIENT_ID     | claspの設定                   |
+| CLIENT_SECRET | claspの設定                   |
+| DEPLOYMENT_ID | claspの設定                   |
+| EXPIRY_DATE   | claspの設定                   |
+| ID_TOKEN      | claspの設定                   |
+| REFRESH_TOKEN | claspの設定                   |
+| SCRIPT_ID     | GASプロジェクトのスクリプトID |
 
 ## 開発
 
