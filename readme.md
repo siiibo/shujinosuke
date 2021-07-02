@@ -41,7 +41,7 @@ Google Apps Script で作成している Slack Bot です。
 - GHAでclaspを利用するためにGitHub Secretsに値を設定する
   - 2021/06/21時点では `masaya.hirose@siiibo.com` の値が登録されている
 - 設定する値は以下の通り
-  - claspの設定は `cat ~/.clasprc.json| jq` などを実行すれば出てくる（Macの場合）
+  - clasp の設定は `~/.clasprc.json`に保存されている（Mac の場合）
 
 | KEY           | 説明                          |
 | ------------- | ----------------------------- |
