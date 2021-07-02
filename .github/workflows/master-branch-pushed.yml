@@ -70,7 +70,7 @@ jobs:
           EOS
           ) > ~/.clasp.json
       - name: Build
-        run: npx webpack
+        run: yarn webpack
       - name: Push
         run: |
           yarn clasp push --force
