@@ -2,11 +2,11 @@ name: Master
 
 on:
   push:
-    branches:
-      - "master"
-    paths-ignore:
-      - "**.md"
-  workflow_dispatch:
+  #   branches:
+  #     - "master"
+  #   paths-ignore:
+  #     - "**.md"
+  # workflow_dispatch:
 
 jobs:
   deploy:
