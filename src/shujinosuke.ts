@@ -484,7 +484,7 @@ const handleAppMention = (slackClient: SlackClient, appMentionEvent: GenericMess
     client.chat.postEphemeral({
       channel: event.channel,
       user: event.user,
-      text: `pong!\n` + getChannelStateMessage(event.channel)
+      text: `popopopong!\n` + getChannelStateMessage(event.channel)
     })
   });
 
