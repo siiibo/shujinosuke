@@ -12,10 +12,8 @@ jobs:
   deploy:
     runs-on: ubuntu-latest
     steps:
-      - name: Setup repository
-        uses: actions/checkout@v2
-      - name: Setup Node
-        uses: actions/setup-node@v2
+      - uses: actions/checkout@v2
+      - uses: actions/setup-node@v2
         with:
           node-version: "14"
       - uses: actions/cache@v2
@@ -24,8 +22,7 @@ jobs:
           key: ${{ runner.os }}-yarn-${{ hashFiles('yarn.lock') }}
           restore-keys: |
             ${{ runner.os }}-yarn-
-      - name: yarn install
-        run: yarn install --prefer-offline
+      - run: yarn install --prefer-offline
       - name: Create ~/.clasprc.json
         run: |
           echo $(cat <<-EOS
@@ -56,11 +53,6 @@ jobs:
           }
           EOS
           ) > ~/.clasp.json
-      - name: Build
-        run: yarn webpack
-      - name: Push
-        run: |
-          yarn clasp push --force
-      - name: Deploy
-        run: |
-          yarn clasp deploy -i ${{ secrets.DEPLOYMENT_ID }}
+      - run: yarn webpack
+      - run: yarn clasp push --force
+      - run: yarn clasp deploy -i ${{ secrets.DEPLOYMENT_ID }}
