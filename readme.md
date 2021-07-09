@@ -19,10 +19,6 @@ Google Apps Script で作成している Slack Bot です。
 
 ## 環境構築
 
-- [clasp](https://github.com/google/clasp)をインストール
-  - GAS プロジェクトの開発をローカルで行うためのツール
-  - `npm install -g @google/clasp` など（詳細はリンク先参照）
-- Shujinosuke の GAS プロジェクトにアクセスできるアカウントで `clasp login`
 - [Shujinoske slack app](https://api.slack.com/apps/A0108T7KFV0/general)のコラボレータに招待してもらう
 - このリポジトリを clone して、以下実行
 
@@ -32,11 +28,31 @@ Google Apps Script で作成している Slack Bot です。
   yarn
   ```
 
+- `yarn clasp login`を実行
+  - Shujinosuke の GAS プロジェクトにアクセスできるアカウントで[clasp](https://github.com/google/clasp)の設定
 - 完全に新しいGASプロジェクトに移行する時は初回のみ以下の操作が必要（更新の場合は不要）
   - `yarn run buildpush` を実行
   - GASエディタを開き( `clasp open` )、 `init` 関数を実行する
     - 初回の実行時はGASに権限付与する必要があるので、画面にしたがって権限を付与する
     - `init` によってSlackTokenなど必要な情報がGASプロジェクトに登録される
+
+### GitHub Secretsの登録
+
+- GHAでclaspを利用するためにGitHub Secretsに値を設定する
+  - 2021/06/21時点では `masaya.hirose@siiibo.com` の値が登録されている
+- 設定する値は以下の通り
+  - clasp の設定は `~/.clasprc.json`に保存されている（Mac の場合）
+
+| KEY           | 説明                          |
+| ------------- | ----------------------------- |
+| ACCESS_TOKEN  | claspの設定                   |
+| CLIENT_ID     | claspの設定                   |
+| CLIENT_SECRET | claspの設定                   |
+| DEPLOYMENT_ID | claspの設定                   |
+| EXPIRY_DATE   | claspの設定                   |
+| ID_TOKEN      | claspの設定                   |
+| REFRESH_TOKEN | claspの設定                   |
+| SCRIPT_ID     | GASプロジェクトのスクリプトID |
 
 ## 開発
 
@@ -55,9 +71,7 @@ Google Apps Script で作成している Slack Bot です。
 
 ### 本番環境
 
-- ~~GitHub リポジトリと同期しているので、GitHub に`master`ブランチを push すればデプロイされる~~
-  - GASへの移行後一時的に同期は解除されている
-  - 近日中にGHAを用いて同期処理を実装する予定
+- GitHub リポジトリと同期しているので、GitHub に`master`ブランチを push すればデプロイされる
 - ローカルでコードを変更した後手動でデプロイ
   - `yarn run buildpush` を実行
   - `clasp deploy -i <deploymentId>` を実行
