@@ -25,7 +25,7 @@ jobs:
       - run: yarn install --prefer-offline
       - name: Create ~/.clasprc.json
         run: |
-          echo $(cat <<-EOS
+          cat <<-EOS > ~/.clasprc.json
           {
             "token": {
               "access_token": "${{ secrets.ACCESS_TOKEN }}",
@@ -43,16 +43,14 @@ jobs:
             "isLocalCreds": false
           }
           EOS
-          ) > ~/.clasprc.json
       - name: Create ~/.clasp.json
         run: |
-          echo $(cat <<-EOS
+          cat <<-EOS > ~/.clasp.json
           {
             "scriptId": "${{ secrets.SCRIPT_ID }}",
             "rootDir": "build"
           }
           EOS
-          ) > ~/.clasp.json
       - run: yarn webpack
       - run: yarn clasp push --force
       - run: yarn clasp deploy -i ${{ secrets.DEPLOYMENT_ID }}
