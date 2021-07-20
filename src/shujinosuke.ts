@@ -353,15 +353,15 @@ const getChannelStateMessage = (channelId: string) => {
 const getListen = (client: SlackClient, event: SlackEvent) => {
   switch (event.type) {
     case 'app_mention':
-      return (regExp: RegExp, callback: (client: SlackClient, event: GenericMessageEvent) => void) => {
+      return (regExp: RegExp, callback: (client: SlackClient, event: AppMentionEvent) => void) => {
         const messageContent = event.text.replace(/^<@\w+>\s*/, '');
         if (messageContent.match(regExp)) {
-          callback(client, event as unknown as GenericMessageEvent);
+          callback(client, event as AppMentionEvent);
         }
       }
   }
 }
-const getThreadTs = (event: GenericMessageEvent | AppMentionEvent) => {
+const getThreadTs = (event: AppMentionEvent) => {
   return event.thread_ts ? event.thread_ts : event.ts;
 }
 
@@ -369,9 +369,7 @@ const getThreadTs = (event: GenericMessageEvent | AppMentionEvent) => {
 const handleSlackEvent = (client: SlackClient, event: SlackEvent) => {
   switch (event.type) {
     case 'app_mention':
-      // 公式が提供しているAppMentionEvent型では足りないプロパティがあるためGenericMessageEvent型を利用している
-      // see https://github.com/siiibo/shujinosuke/pull/16#discussion_r642349045
-      handleAppMention(client, event as unknown as GenericMessageEvent);
+      handleAppMention(client, event as AppMentionEvent);
       break;
     case 'message':
       handleMessageEvent(client, event as GenericMessageEvent);
@@ -395,7 +393,7 @@ const handleMessageEvent = (client: SlackClient, event: GenericMessageEvent) => 
 }
 
 
-const handleAppMention = (slackClient: SlackClient, appMentionEvent: GenericMessageEvent) => {
+const handleAppMention = (slackClient: SlackClient, appMentionEvent: AppMentionEvent) => {
   const listen = getListen(slackClient, appMentionEvent);
 
   listen(/^開始$/, (client, event) => {
