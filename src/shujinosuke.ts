@@ -79,9 +79,9 @@ const sendReminderForJoin = async () => {
   const client = getSlackClient();
   const sessionChannelId = getSessionChannelId();
   const channelState = getChannelState(sessionChannelId);
-  const channelMembers = (await client.conversations.members({
+  const channelMembers = client.conversations.members({
     channel: sessionChannelId
-  })).members.filter(userId => !exceptions.includes(userId));
+  }).members.filter(userId => !exceptions.includes(userId));
   const remindTargets = channelMembers.filter(userId => {
     return (
       !channelState.done.includes(userId) &&
@@ -89,7 +89,7 @@ const sendReminderForJoin = async () => {
     )
   });
   remindTargets.forEach(async (remindTarget) => {
-    if ((await client.users.getPresence({ user: remindTarget })).presence === 'active') {
+    if (client.users.getPresence({ user: remindTarget }).presence === 'active') {
       client.chat.postEphemeral({
         channel: sessionChannelId,
         user: remindTarget,
@@ -551,7 +551,7 @@ const handleEmojiChange = (client: SlackClient, event: EmojiChangedEvent) => {
   }
 }
 
-const handleChannelCreated = (client: SlackClient, event: ChannelCreatedEvent)=>{
+const handleChannelCreated = (client: SlackClient, event: ChannelCreatedEvent) => {
   client.chat.postMessage({
     channel: CHANNEL_EVENT_POST_CHANNEL,
     text: `<#${event.channel.id}>が追加されました！`
