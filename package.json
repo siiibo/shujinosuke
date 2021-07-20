@@ -14,7 +14,7 @@
     "postinstall": "mkdir -p build && cp appsscript.json build/appsscript.json"
   },
   "dependencies": {
-    "@hi-se/web-api": "https://gitpkg.now.sh/hi-se/node-slack-sdk/packages/web-api?d6102cf8c48b6494d4afc4c01977e5235292c0eb",
+    "@hi-se/web-api": "https://gitpkg.now.sh/hi-se/node-slack-sdk/packages/web-api?ab078b145617d511327a8f74fe34f1d4695ff893",
     "@slack/bolt": "^3.3.0",
     "moment": "^2.29.1"
   },
