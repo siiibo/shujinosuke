@@ -107,6 +107,13 @@ const sendReminderForEndSession = () => {
   const client = getSlackClient();
   const sessionChannelId = getSessionChannelId();
   const channelState = getChannelState(sessionChannelId);
+  if (!channelState?.waiting.length && !channelState?.done.length) {
+    abortSession(sessionChannelId);
+    client.chat.postMessage({
+      channel: sessionChannelId,
+      text: `:fast_forward: 終了します。`
+    })
+  }
   if (channelState?.waiting.length) {
     client.chat.postMessage({
       channel: sessionChannelId,
@@ -114,14 +121,6 @@ const sendReminderForEndSession = () => {
         `:stopwatch: あと${channelState.waiting.length}人です。全体連絡を先に始めていてもOKです。\n` +
         `:question: 私がちゃんと反応しなかった場合、削除して投稿し直してみてください。`
       )
-    })
-  } else if (channelState?.done.length) {
-    // Do nothing; endSession timer should be working
-  } else {
-    abortSession(sessionChannelId);
-    client.chat.postMessage({
-      channel: sessionChannelId,
-      text: `:fast_forward: 終了します。`
     })
   }
 }
