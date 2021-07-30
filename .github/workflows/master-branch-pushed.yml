@@ -43,9 +43,9 @@ jobs:
             "isLocalCreds": false
           }
           EOS
-      - name: Create ~/.clasp.json
+      - name: Create .clasp.json
         run: |
-          cat <<-EOS > ~/.clasp.json
+          cat <<-EOS > ${ GITHUB_WORKSPACE }/.clasp.json
           {
             "scriptId": "${{ secrets.SCRIPT_ID }}",
             "rootDir": "build"
