@@ -115,6 +115,8 @@ const sendReminderForEndSession = () => {
         `:question: 私がちゃんと反応しなかった場合、削除して投稿し直してみてください。`
       )
     })
+  } else if (channelState?.done.length) {
+    // Do nothing; endSession timer should be working
   } else {
     abortSession(sessionChannelId);
     client.chat.postMessage({
@@ -551,7 +553,7 @@ const handleEmojiChange = (client: SlackClient, event: EmojiChangedEvent) => {
   }
 }
 
-const handleChannelCreated = (client: SlackClient, event: ChannelCreatedEvent)=>{
+const handleChannelCreated = (client: SlackClient, event: ChannelCreatedEvent) => {
   client.chat.postMessage({
     channel: CHANNEL_EVENT_POST_CHANNEL,
     text: `<#${event.channel.id}>が追加されました！`
