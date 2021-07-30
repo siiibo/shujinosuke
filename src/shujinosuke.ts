@@ -156,7 +156,8 @@ const checkAllReported = (client: SlackClient, channelId: string) => {
       text: (
         `:+1: 全員のレポートが完了しました！\n` +
         `:stopwatch: それでは、${readableEndingPeriod}ほど時間を取りますので、全体連絡のある方はお願いします。\n` +
-        `:eyes: また、この時間で皆さんのレポートを読んでコメントしましょう！（もちろん時間が過ぎたあとも続けて:ok:）`
+        `:eyes: また、この時間で皆さんのレポートを読んでコメントしましょう！（もちろん時間が過ぎたあとも続けて:ok:）\n` +
+        `:google: こちらのMeetに参加しておしゃべりもどうぞ！ https://meet.google.com/ofo-ykna-amj`
       )
     })
   }
