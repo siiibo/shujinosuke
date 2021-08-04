@@ -432,6 +432,7 @@ const handleAppMention = (slackClient: SlackClient, appMentionEvent: AppMentionE
                 `:spiral_calendar_pad: 週次定例を始めます！\n` +
                 `:mega: 参加者は「:rocket: 参加」ボタンをクリックか、「 *@Shujinosuke 参加* 」と返信！\n` +
                 `:clipboard: 以下をコピーして書き換えてレポートをまとめ、できたらどんどん投稿しましょう！\n` +
+                ':warning: レポートを投稿する際は `@Shujinosuke レポート` と入力してください！\n' +
                 `:stopwatch: ${readableCheckTimeout}後にリマインドし、全員投稿したら全体連絡の時間に移ります。\n` +
                 `:question: 私がちゃんと反応しなかった場合、投稿を一度削除して投稿し直してみてください。\n` +
                 `:google: こちらのMeetに参加しておしゃべりもどうぞ！ https://meet.google.com/ofo-ykna-amj`,
@@ -445,14 +446,10 @@ const handleAppMention = (slackClient: SlackClient, appMentionEvent: AppMentionE
             text: {
               type: "mrkdwn",
               text:
-                'レポートを投稿する際は `@Shujinosuke レポート` と入力してください！\n\n' +
-                `\`\`\`\n` +
-                '（レポートの例）\n\n' +
                 `@Shujinosuke レポート\n` +
                 `*調子、出来事、悩み等*\n\n` +
                 `* サーバの電流から酸っぱい味がする\n` +
-                `* 水曜日以外やることがあんまりなくて暇だ` +
-                `\`\`\``,
+                `* 水曜日以外やることがあんまりなくて暇だ`,
             },
           },
           {
