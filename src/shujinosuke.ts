@@ -445,6 +445,7 @@ const handleAppMention = (slackClient: SlackClient, appMentionEvent: AppMentionE
             text: {
               type: "mrkdwn",
               text:
+                'レポートをする際は以下の例のように `@Shujinosuke レポート` をつけるようにしてください。\n\n' +
                 `@Shujinosuke レポート\n` +
                 `*調子、出来事、悩み等*\n\n` +
                 `* サーバの電流から酸っぱい味がする\n` +
