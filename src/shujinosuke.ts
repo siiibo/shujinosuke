@@ -218,7 +218,7 @@ const getChannelState = (channelId: string): ChannelState => {
   };
 }
 
-const isInMeeting = (channelId: string): boolean => {
+const isStarted = (channelId: string): boolean => {
   const channelState = getChannelState(channelId);
   if (channelState.done.length || channelState.waiting.length) {
     return true;
@@ -407,7 +407,7 @@ const handleAppMention = (slackClient: SlackClient, appMentionEvent: AppMentionE
   const listen = getListen(slackClient, appMentionEvent);
 
   listen(/^開始$/, (client, event) => {
-    if (isInMeeting(event.channel)) {
+    if (isStarted(event.channel)) {
       client.chat.postEphemeral({
         channel: event.channel,
         user: event.user,
@@ -483,7 +483,7 @@ const handleAppMention = (slackClient: SlackClient, appMentionEvent: AppMentionE
         `:pencil: 皆さんコメントや質問をどうぞ！\n` +
         `(チャンネルを読みやすく保つため、「以下にも投稿する：<#${event.channel}>」は使わないようにお願いします)`
     });
-    if (isInMeeting(event.channel)) {
+    if (isStarted(event.channel)) {
       makeDoneFromWaiting(event.channel, event.user);
       checkAllReported(client, event.channel);
     }
