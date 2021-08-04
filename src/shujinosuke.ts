@@ -218,6 +218,15 @@ const getChannelState = (channelId: string): ChannelState => {
   };
 }
 
+const isInMeeting = (channelId: string): boolean => {
+  const channelState = getChannelState(channelId);
+  if (channelState.done.length || channelState.waiting.length) {
+    return true;
+  } else {
+    return false;
+  }
+}
+
 const deleteChannelState = (channelId: string): void => {
   const properties = PropertiesService.getScriptProperties().getProperties();
   const participants = Object.entries(properties).filter(([key, value]) => {
@@ -398,7 +407,8 @@ const handleAppMention = (slackClient: SlackClient, appMentionEvent: AppMentionE
   const listen = getListen(slackClient, appMentionEvent);
 
   listen(/^開始$/, (client, event) => {
-    if (!getChannelState(event.channel).done.length) {
+    if (isInMeeting(event.channel)) {
+    } else {
       initializeSession(event.channel);
       const readableCheckTimeout = moment
         .duration(CHECK_TIMEOUT_SECONDS, 'seconds')
