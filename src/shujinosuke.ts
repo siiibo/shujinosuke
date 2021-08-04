@@ -475,7 +475,6 @@ const handleAppMention = (slackClient: SlackClient, appMentionEvent: AppMentionE
     if (event.edited) {
       return;
     }
-    makeDoneFromWaiting(event.channel, event.user);
     client.chat.postMessage({
       channel: event.channel,
       thread_ts: getThreadTs(event),
@@ -484,7 +483,10 @@ const handleAppMention = (slackClient: SlackClient, appMentionEvent: AppMentionE
         `:pencil: 皆さんコメントや質問をどうぞ！\n` +
         `(チャンネルを読みやすく保つため、「以下にも投稿する：<#${event.channel}>」は使わないようにお願いします)`
     });
-    checkAllReported(client, event.channel);
+    if (isInMeeting(event.channel)) {
+      makeDoneFromWaiting(event.channel, event.user);
+      checkAllReported(client, event.channel);
+    }
   });
 
   listen(/参加/, (client, event) => {
