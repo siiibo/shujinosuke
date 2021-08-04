@@ -408,6 +408,13 @@ const handleAppMention = (slackClient: SlackClient, appMentionEvent: AppMentionE
 
   listen(/^開始$/, (client, event) => {
     if (isInMeeting(event.channel)) {
+      client.chat.postEphemeral({
+        channel: event.channel,
+        user: event.user,
+        text:
+          '既に開始しています。\n' +
+          '状態をリセットしてやり直す場合は`リセット`コマンドを実行してください。'
+      });
     } else {
       initializeSession(event.channel);
       const readableCheckTimeout = moment
