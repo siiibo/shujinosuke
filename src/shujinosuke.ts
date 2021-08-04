@@ -219,6 +219,15 @@ const getChannelState = (channelId: string): ChannelState => {
   };
 }
 
+const isStarted = (channelId: string): boolean => {
+  const channelState = getChannelState(channelId);
+  if (channelState.done.length || channelState.waiting.length) {
+    return true;
+  } else {
+    return false;
+  }
+}
+
 const deleteChannelState = (channelId: string): void => {
   const properties = PropertiesService.getScriptProperties().getProperties();
   const participants = Object.entries(properties).filter(([key, value]) => {
@@ -399,7 +408,15 @@ const handleAppMention = (slackClient: SlackClient, appMentionEvent: AppMentionE
   const listen = getListen(slackClient, appMentionEvent);
 
   listen(/^開始$/, (client, event) => {
-    if (!getChannelState(event.channel).done.length) {
+    if (isStarted(event.channel)) {
+      client.chat.postEphemeral({
+        channel: event.channel,
+        user: event.user,
+        text:
+          '既に開始しています。\n' +
+          '状態をリセットしてやり直す場合は`リセット`コマンドを実行してください。'
+      });
+    } else {
       initializeSession(event.channel);
       const readableCheckTimeout = moment
         .duration(CHECK_TIMEOUT_SECONDS, 'seconds')
@@ -459,7 +476,6 @@ const handleAppMention = (slackClient: SlackClient, appMentionEvent: AppMentionE
     if (event.edited) {
       return;
     }
-    makeDoneFromWaiting(event.channel, event.user);
     client.chat.postMessage({
       channel: event.channel,
       thread_ts: getThreadTs(event),
@@ -468,7 +484,10 @@ const handleAppMention = (slackClient: SlackClient, appMentionEvent: AppMentionE
         `:pencil: 皆さんコメントや質問をどうぞ！\n` +
         `(チャンネルを読みやすく保つため、「以下にも投稿する：<#${event.channel}>」は使わないようにお願いします)`
     });
-    checkAllReported(client, event.channel);
+    if (isStarted(event.channel)) {
+      makeDoneFromWaiting(event.channel, event.user);
+      checkAllReported(client, event.channel);
+    }
   });
 
   listen(/参加/, (client, event) => {
