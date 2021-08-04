@@ -414,7 +414,7 @@ const handleAppMention = (slackClient: SlackClient, appMentionEvent: AppMentionE
         user: event.user,
         text:
           '既に開始しています。\n' +
-          '状態をリセットしてやり直す場合は `リセット` コマンドを実行してください。'
+          '状態をリセットしてやり直す場合は `リセット` `reset` `終了` のいずれかのコマンドを実行してください。'
       });
     } else {
       initializeSession(event.channel);
