@@ -198,7 +198,8 @@ const leave = (client: SlackClient, channelId: string, userId: string) => {
   }
 }
 
-const makeDoneFromWaiting = (channelId: string, userId: string): void => {
+const makeUserStateDone = (channelId: string, userId: string): void => {
+  // Slackの3秒ルールのもとGASで排他制御するのは困難なため、直前の状態がwaitingであるかどうかは確認しない
   setSessionUserState(channelId, userId, 'done');
 }
 
@@ -486,7 +487,7 @@ const handleAppMention = (slackClient: SlackClient, appMentionEvent: AppMentionE
         `(チャンネルを読みやすく保つため、「以下にも投稿する：<#${event.channel}>」は使わないようにお願いします)`
     });
     if (isStarted(event.channel)) {
-      makeDoneFromWaiting(event.channel, event.user);
+      makeUserStateDone(event.channel, event.user);
       checkAllReported(client, event.channel);
     }
   });
