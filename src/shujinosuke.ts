@@ -198,7 +198,8 @@ const leave = (client: SlackClient, channelId: string, userId: string) => {
   }
 }
 
-const makeDoneFromWaiting = (channelId: string, userId: string): void => {
+const makeUserStateDone = (channelId: string, userId: string): void => {
+  // Slackの3秒ルールのもとGASで排他制御するのは困難なため、直前の状態がwaitingであるかどうかは確認しない
   setSessionUserState(channelId, userId, 'done');
 }
 
@@ -270,7 +271,7 @@ const getSlackClient = () => {
 
 
 const doPost = (e: GoogleAppsScript.Events.DoPost) => {
-  console.info(`[doPost raw event]\n\n${JSON.stringify(e)}`);
+  console.info(JSON.stringify({ eventName: 'Shujiinosuke doPost', event: e }))
   if (isUrlVerification(e)) {
     return ContentService.createTextOutput(JSON.parse(e.postData.contents)['challenge']);
   }
@@ -432,6 +433,7 @@ const handleAppMention = (slackClient: SlackClient, appMentionEvent: AppMentionE
                 `:spiral_calendar_pad: 週次定例を始めます！\n` +
                 `:mega: 参加者は「:rocket: 参加」ボタンをクリックか、「 *@Shujinosuke 参加* 」と返信！\n` +
                 `:clipboard: 以下をコピーして書き換えてレポートをまとめ、できたらどんどん投稿しましょう！\n` +
+                ':warning: レポートを投稿する際は `@Shujinosuke レポート` と入力してください！\n' +
                 `:stopwatch: ${readableCheckTimeout}後にリマインドし、全員投稿したら全体連絡の時間に移ります。\n` +
                 `:question: 私がちゃんと反応しなかった場合、投稿を一度削除して投稿し直してみてください。\n` +
                 `:google: こちらのMeetに参加しておしゃべりもどうぞ！ https://meet.google.com/ofo-ykna-amj`,
@@ -485,7 +487,7 @@ const handleAppMention = (slackClient: SlackClient, appMentionEvent: AppMentionE
         `(チャンネルを読みやすく保つため、「以下にも投稿する：<#${event.channel}>」は使わないようにお願いします)`
     });
     if (isStarted(event.channel)) {
-      makeDoneFromWaiting(event.channel, event.user);
+      makeUserStateDone(event.channel, event.user);
       checkAllReported(client, event.channel);
     }
   });
