@@ -366,7 +366,7 @@ const getListen = (client: SlackClient, event: SlackEvent) => {
   switch (event.type) {
     case 'app_mention':
       return (regExp: RegExp, callback: (client: SlackClient, event: AppMentionEvent) => void) => {
-        const messageContent = event.text.replace(/^<@\w+>\s*/, '');
+        const messageContent = event.text.replace(/<@\w+>\s*/, '');
         if (messageContent.match(regExp)) {
           callback(client, event as AppMentionEvent);
         }
@@ -408,7 +408,7 @@ const handleMessageEvent = (client: SlackClient, event: GenericMessageEvent) => 
 const handleAppMention = (slackClient: SlackClient, appMentionEvent: AppMentionEvent) => {
   const listen = getListen(slackClient, appMentionEvent);
 
-  listen(/^開始$/, (client, event) => {
+  listen(/開始/, (client, event) => {
     if (isStarted(event.channel)) {
       client.chat.postEphemeral({
         channel: event.channel,
@@ -474,7 +474,7 @@ const handleAppMention = (slackClient: SlackClient, appMentionEvent: AppMentionE
 
   });
 
-  listen(/^レポート|調子、出来事、悩み等/, async (client, event) => {
+  listen(/レポート|調子、出来事、悩み等/, async (client, event) => {
     if (event.edited) {
       return;
     }
@@ -497,11 +497,11 @@ const handleAppMention = (slackClient: SlackClient, appMentionEvent: AppMentionE
   });
 
 
-  listen(/^キャンセル$/, (client, event) => {
+  listen(/キャンセル/, (client, event) => {
     leave(client, event.channel, event.user);
   });
 
-  listen(/^ping$/i, (client, event) => {
+  listen(/ping/i, (client, event) => {
     client.chat.postEphemeral({
       channel: event.channel,
       user: event.user,
@@ -509,7 +509,7 @@ const handleAppMention = (slackClient: SlackClient, appMentionEvent: AppMentionE
     })
   });
 
-  listen(/^(ヘルプ|help)$/i, (client, event) => {
+  listen(/(ヘルプ|help)/i, (client, event) => {
     client.chat.postEphemeral({
       channel: event.channel,
       user: event.user,
@@ -517,14 +517,14 @@ const handleAppMention = (slackClient: SlackClient, appMentionEvent: AppMentionE
     });
   })
 
-  listen(/^status$/i, (client, event) => {
+  listen(/status/i, (client, event) => {
     client.chat.postMessage({
       channel: event.channel,
       text: getChannelStateMessage(event.channel)
     });
   });
 
-  listen(/^(終了|リセット|reset)$/i, (client, event) => {
+  listen(/(終了|リセット|reset)/i, (client, event) => {
     client.chat.postMessage({
       channel: event.channel,
       text: `リセットします。直前の状態は以下のようになっていました\n` +
@@ -533,7 +533,7 @@ const handleAppMention = (slackClient: SlackClient, appMentionEvent: AppMentionE
     abortSession(event.channel);
   });
 
-  listen(/(^残りは[？?]?|誰[？?]?$)/, (client, event) => {
+  listen(/(残りは[？?]?|誰[？?]?)/, (client, event) => {
     const channelState = getChannelState(event.channel);
     if (channelState) {
       if (channelState.waiting) {
@@ -553,7 +553,7 @@ const handleAppMention = (slackClient: SlackClient, appMentionEvent: AppMentionE
       }
     }
   });
-  listen(/^check/, (client, event) => {
+  listen(/check/, (client, event) => {
     client.chat.postMessage({
       channel: event.channel,
       text: 'check'
