@@ -367,7 +367,7 @@ const getListen = (client: SlackClient, event: SlackEvent) => {
     case 'app_mention':
       return (command: RegExp, callback: (client: SlackClient, event: AppMentionEvent) => void) => {
         const messageContent = event.text;
-        const commandRegExp = new RegExp('/<@\w+>\s*/' + command);
+        const commandRegExp = new RegExp('<@\w+>\s*' + command.toString().replaceAll('/', ''));
         if (messageContent.match(commandRegExp)) {
           callback(client, event as AppMentionEvent);
         }
