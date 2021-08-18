@@ -365,9 +365,10 @@ const getChannelStateMessage = (channelId: string) => {
 const getListen = (client: SlackClient, event: SlackEvent) => {
   switch (event.type) {
     case 'app_mention':
-      return (regExp: RegExp, callback: (client: SlackClient, event: AppMentionEvent) => void) => {
-        const messageContent = event.text.replace(/<@\w+>\s*/, '');
-        if (messageContent.match(regExp)) {
+      return (command: RegExp, callback: (client: SlackClient, event: AppMentionEvent) => void) => {
+        const messageContent = event.text;
+        const commandRegExp = new RegExp('/<@\w+>\s*/' + command);
+        if (messageContent.match(commandRegExp)) {
           callback(client, event as AppMentionEvent);
         }
       }
