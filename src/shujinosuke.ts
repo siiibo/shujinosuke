@@ -363,7 +363,7 @@ const getChannelStateMessage = (channelId: string) => {
 }
 
 const isOriginalCommand = (target: string, commandRegExpString: string) => {
-  const commandRegExp = new RegExp(`<@\\w+[\\w\\s\|]*>\\s+${commandRegExpString}($|\\s+)`);
+  const commandRegExp = new RegExp(`<@\\w+[\\w\\s\|]*>\\s+${commandRegExpString}($|[\\s.]+)`);
   return target.match(commandRegExp);
 }
 
