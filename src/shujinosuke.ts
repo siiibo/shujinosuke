@@ -362,12 +362,16 @@ const getChannelStateMessage = (channelId: string) => {
   }
 }
 
+const isOriginalCommand = (target: string, commandRegExpString: string) => {
+  const commandRegExp = new RegExp(`<@\\w+[\\w\\s\|]*>\\s+${commandRegExpString}($|\\s+)`);
+  return target.match(commandRegExp);
+}
+
 const getListen = (client: SlackClient, event: SlackEvent) => {
   switch (event.type) {
     case 'app_mention':
       return (commandRegExpString: string, callback: (client: SlackClient, event: AppMentionEvent) => void) => {
-        const commandRegExp = new RegExp(`<@\\w+[\\w\\s\|]*>\\s+${commandRegExpString}($|\\s+)`);
-        if (event.text.match(commandRegExp)) {
+        if (isOriginalCommand(event.text, commandRegExpString)) {
           callback(client, event as AppMentionEvent);
         }
       }
