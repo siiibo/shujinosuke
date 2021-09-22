@@ -322,9 +322,8 @@ const getHelpMessage = (channelId: string) => {
     アクティブメンバーの確認: "`誰いる？` `今いる人は？`",
   };
 
-  const channelState = getChannelState(channelId);
-  if (channelState) {
-    const commands = Object.entries(helpCommandsInWaiting)
+  if (isStarted(channelId)) {
+    const commands = Object.entries(helpCommandsInMeeting)
       .map(([command, explanation]) => command + "\n" + explanation)
       .join("\n\n");
     return (
@@ -333,7 +332,7 @@ const getHelpMessage = (channelId: string) => {
       `${commands}`
     );
   } else {
-    const commands = Object.entries(helpCommandsInMeeting)
+    const commands = Object.entries(helpCommandsInWaiting)
       .map(([command, explanation]) => command + "\n" + explanation)
       .join("\n\n");
 
