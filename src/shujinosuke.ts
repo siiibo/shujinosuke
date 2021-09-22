@@ -537,23 +537,24 @@ const handleAppMention = (slackClient: SlackClient, appMentionEvent: AppMentionE
   });
 
   listen('(残りは[？?]?|誰[？?]?)', (client, event) => {
+    if (!isStarted(event.channel)) {
+      return;
+    }
     const channelState = getChannelState(event.channel);
-    if (channelState) {
-      if (channelState.waiting) {
-        const remaining = channelState.waiting.map(_userId => `<@${_userId}>`).join(',');
-        client.chat.postMessage({
-          channel: event.channel,
-          text:
-            `:point_right: 残りは${remaining}です。\n` +
-            `:fast_forward: 急用ができたら「 *@Shujinosuke キャンセル* 」もできます。\n` +
-            `:question: 私がちゃんと反応しなかった場合、削除して投稿し直してみてくだFさい。`
-        })
-      } else {
-        client.chat.postMessage({
-          channel: event.channel,
-          text: ":point_up: 今は全体連絡とレポートレビューの時間です。"
-        })
-      }
+    if (channelState.waiting.length) {
+      const remaining = channelState.waiting.map(_userId => `<@${_userId}>`).join(',');
+      client.chat.postMessage({
+        channel: event.channel,
+        text:
+          `:point_right: 残りは${remaining}です。\n` +
+          `:fast_forward: 急用ができたら「 *@Shujinosuke キャンセル* 」もできます。\n` +
+          `:question: 私がちゃんと反応しなかった場合、削除して投稿し直してみてくだFさい。`
+      })
+    } else {
+      client.chat.postMessage({
+        channel: event.channel,
+        text: ":point_up: 今は全体連絡とレポートレビューの時間です。"
+      })
     }
   });
   listen('check', (client, event) => {
