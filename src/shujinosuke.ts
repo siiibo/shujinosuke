@@ -315,7 +315,7 @@ const getHelpMessage = (channelId: string) => {
     会議の強制終了: "`終了` `リセット` `reset`",
     会議へ参加: "`参加`",
     参加の取り消し: "`キャンセル`",
-    レポート未投稿者の確認: "`誰？` `残りは？`",
+    レポート未投稿者の確認: "`あと誰？` `残りは？`",
     Botステータスの確認: "`status`",
     ping: "`ping`",
     ヘルプ: "`ヘルプ` `help`",
@@ -536,7 +536,7 @@ const handleAppMention = (slackClient: SlackClient, appMentionEvent: AppMentionE
     abortSession(event.channel);
   });
 
-  listen('(残りは[？?]?|誰[？?]?)', (client, event) => {
+  listen('(残りは[？?]?|あと誰[？?]?)', (client, event) => {
     if (!isStarted(event.channel)) {
       return;
     }
