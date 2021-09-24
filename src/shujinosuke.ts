@@ -315,16 +315,15 @@ const getHelpMessage = (channelId: string) => {
     会議の強制終了: "`終了` `リセット` `reset`",
     会議へ参加: "`参加`",
     参加の取り消し: "`キャンセル`",
-    レポート未投稿者の確認: "`誰？` `残りは？`",
+    レポート未投稿者の確認: "`あと誰？` `残りは？`",
     Botステータスの確認: "`status`",
     ping: "`ping`",
     ヘルプ: "`ヘルプ` `help`",
     アクティブメンバーの確認: "`誰いる？` `今いる人は？`",
   };
 
-  const channelState = getChannelState(channelId);
-  if (channelState) {
-    const commands = Object.entries(helpCommandsInWaiting)
+  if (isStarted(channelId)) {
+    const commands = Object.entries(helpCommandsInMeeting)
       .map(([command, explanation]) => command + "\n" + explanation)
       .join("\n\n");
     return (
@@ -333,7 +332,7 @@ const getHelpMessage = (channelId: string) => {
       `${commands}`
     );
   } else {
-    const commands = Object.entries(helpCommandsInMeeting)
+    const commands = Object.entries(helpCommandsInWaiting)
       .map(([command, explanation]) => command + "\n" + explanation)
       .join("\n\n");
 
@@ -537,24 +536,25 @@ const handleAppMention = (slackClient: SlackClient, appMentionEvent: AppMentionE
     abortSession(event.channel);
   });
 
-  listen('(残りは[？?]?|誰[？?]?)', (client, event) => {
+  listen('(残りは[？?]?|あと誰[？?]?)', (client, event) => {
+    if (!isStarted(event.channel)) {
+      return;
+    }
     const channelState = getChannelState(event.channel);
-    if (channelState) {
-      if (channelState.waiting) {
-        const remaining = channelState.waiting.map(_userId => `<@${_userId}>`).join(',');
-        client.chat.postMessage({
-          channel: event.channel,
-          text:
-            `:point_right: 残りは${remaining}です。\n` +
-            `:fast_forward: 急用ができたら「 *@Shujinosuke キャンセル* 」もできます。\n` +
-            `:question: 私がちゃんと反応しなかった場合、削除して投稿し直してみてくだFさい。`
-        })
-      } else {
-        client.chat.postMessage({
-          channel: event.channel,
-          text: ":point_up: 今は全体連絡とレポートレビューの時間です。"
-        })
-      }
+    if (channelState.waiting.length) {
+      const remaining = channelState.waiting.map(_userId => `<@${_userId}>`).join(',');
+      client.chat.postMessage({
+        channel: event.channel,
+        text:
+          `:point_right: 残りは${remaining}です。\n` +
+          `:fast_forward: 急用ができたら「 *@Shujinosuke キャンセル* 」もできます。\n` +
+          `:question: 私がちゃんと反応しなかった場合、削除して投稿し直してみてくだFさい。`
+      })
+    } else {
+      client.chat.postMessage({
+        channel: event.channel,
+        text: ":point_up: 今は全体連絡とレポートレビューの時間です。"
+      })
     }
   });
   listen('check', (client, event) => {
