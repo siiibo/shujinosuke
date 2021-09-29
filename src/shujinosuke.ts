@@ -563,7 +563,34 @@ const handleAppMention = (slackClient: SlackClient, appMentionEvent: AppMentionE
       text: 'check'
     })
     sendReminderForJoin();
-  })
+  });
+
+  listen('アルバイトシフト', (client, event) => {
+    const calendarId = 'c_1889m1jd2rticjeig08cshi84mnrs4gaedkmiqb2dsn66rrd@resource.calendar.google.com';
+    const calendar = CalendarApp.getCalendarById(calendarId);
+    const targetDate = new Date();
+    const dailyShifts = calendar.getEventsForDay(targetDate);
+
+    if (!dailyShifts.length) {
+      client.chat.postMessage({
+        channel: event.channel,
+        text: '今日の予定はありません'
+      });
+      return;
+    }
+
+    const notificationString = dailyShifts.map(dailyShift => {
+      const title = dailyShift.getTitle()
+      const startTime = Utilities.formatDate(dailyShift.getStartTime(), 'Asia/Tokyo', 'HH:mm');
+      const endTime = Utilities.formatDate(dailyShift.getEndTime(), 'Asia/Tokyo', 'HH:mm');
+      return `${title}  ${startTime} 〜 ${endTime}`
+    }).join('\n');
+
+    client.chat.postMessage({
+      channel: event.channel,
+      text: notificationString
+    });
+  });
 }
 
 
