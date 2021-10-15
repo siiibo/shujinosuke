@@ -187,7 +187,7 @@ const join = (client: SlackClient, channelId: string, userId: string) => {
 
 const leave = (client: SlackClient, channelId: string, userId: string) => {
   const channelState: ChannelState = getChannelState(channelId);
-  if (!channelState) {
+  if (!isStarted(channelId)) {
     client.chat.postMessage({ channel: channelId, text: 'no channel state' });
     return;
   }
