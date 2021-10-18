@@ -363,12 +363,12 @@ const getChannelStateMessage = (channelId: string) => {
 
 const isOriginalCommand = (target: string, commandRegExpString: string) => {
   const regExpString = {
-    slackMarkUp: `([\*_~\`>]|\`{3,})*`,
-    slackMention: `<@\\w+[\\w\\s\|]*>`,
-    commandEnd: `($|[\\s.]+)`, // SlackBotのリマインダーで英字コマンドを呼び出すと文末にピリオド(.)が追加される
+    slackMarkUp: "([*_~`>]|`{3,})*",
+    slackMention: "<@\\w+[\\w\\s\|]*>\\s+",
+    commandEnd: "($|[\\s.]+)", // SlackBotのリマインダーで英字コマンドを呼び出すと文末にピリオド(.)が追加される
   }
   const commandRegExp = new RegExp(
-    `${regExpString.slackMention}\\s+` +
+    regExpString.slackMention +
     regExpString.slackMarkUp +
     commandRegExpString +
     regExpString.slackMarkUp +
