@@ -16,7 +16,7 @@
   "dependencies": {
     "@hi-se/web-api": "https://gitpkg.now.sh/hi-se/node-slack-sdk/packages/web-api?ab078b145617d511327a8f74fe34f1d4695ff893",
     "@slack/bolt": "^3.5.0",
-    "moment": "^2.29.1"
+    "moment": "^2.29.2"
   },
   "devDependencies": {
     "@google/clasp": "^2.4.0",
