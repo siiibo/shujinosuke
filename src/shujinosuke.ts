@@ -6,8 +6,6 @@ import moment from 'moment';
 moment.locale('ja');
 
 const TOKEN_SHEET_ID = '1ExiQonKpf2T8NnR9YFMzoD7jobHEuAXUUq3vaBL0hW8';
-const EMOJI_EVENT_POST_CHANNEL = "C011BG29K71" // #雑談
-const CHANNEL_EVENT_POST_CHANNEL = "C011BG29K71"; // #雑談
 const CHECK_TIMEOUT_SECONDS = 1200;
 const ENDING_PERIOD_SECONDS = 300;
 const CALL_REMINDER_SECONDS = 180;
@@ -400,12 +398,6 @@ const handleSlackEvent = (client: SlackClient, event: SlackEvent) => {
     case 'message':
       handleMessageEvent(client, event as GenericMessageEvent);
       break;
-    case 'emoji_changed':
-      handleEmojiChange(client, event as EmojiChangedEvent);
-      break;
-    case 'channel_created':
-      handleChannelCreated(client, event as ChannelCreatedEvent);
-      break;
   }
 }
 
@@ -575,51 +567,8 @@ const handleAppMention = (slackClient: SlackClient, appMentionEvent: AppMentionE
     })
     sendReminderForJoin();
   });
-
-  listen('アルバイトシフト', (client, event) => {
-    const calendarId = 'c_1889m1jd2rticjeig08cshi84mnrs4gaedkmiqb2dsn66rrd@resource.calendar.google.com';
-    const calendar = CalendarApp.getCalendarById(calendarId);
-    const targetDate = new Date();
-    const dailyShifts = calendar.getEventsForDay(targetDate);
-
-    if (!dailyShifts.length) {
-      client.chat.postMessage({
-        channel: event.channel,
-        text: '今日の予定はありません'
-      });
-      return;
-    }
-
-    const notificationString = dailyShifts.map(dailyShift => {
-      const title = dailyShift.getTitle()
-      const startTime = Utilities.formatDate(dailyShift.getStartTime(), 'Asia/Tokyo', 'HH:mm');
-      const endTime = Utilities.formatDate(dailyShift.getEndTime(), 'Asia/Tokyo', 'HH:mm');
-      return `${title}  ${startTime} 〜 ${endTime}`
-    }).join('\n');
-
-    client.chat.postMessage({
-      channel: event.channel,
-      text: notificationString
-    });
-  });
 }
 
-
-const handleEmojiChange = (client: SlackClient, event: EmojiChangedEvent) => {
-  if (event.subtype === 'add') {
-    client.chat.postMessage({
-      channel: EMOJI_EVENT_POST_CHANNEL,
-      text: `:${event.name}:  (\`:${event.name}:\`)が追加されました！`
-    });
-  }
-}
-
-const handleChannelCreated = (client: SlackClient, event: ChannelCreatedEvent) => {
-  client.chat.postMessage({
-    channel: CHANNEL_EVENT_POST_CHANNEL,
-    text: `<#${event.channel.id}>が追加されました！`
-  });
-}
 
 declare const global: any;
 global.doPost = doPost;
